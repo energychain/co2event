@@ -1,0 +1,8 @@
+cmd: npm start
+targets:
+  build-smartcontracts:
+    cmd: "npm run build"
+  flatten-smartcontracts:
+    cmd: "npx waffle flatten"
+  test-smartcontracts:
+    cmd: "npx hardhat test ./smartcontracts/test/co2accounting.test.js"

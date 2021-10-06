@@ -1,0 +1,279 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ID-Ideal - AP8",
+    "description": "Sample Requests using the [Corrently Ecosystem](https://corrently.io) as implementation. You might get an `account` using the [Create Stromkonto Endpoint](https://api.corrently.io/v2.0/stromkonto/create) or use one from an existing eWallet.\n## Test Szenario\n<html><ol> <li>Create a primary and secondary wallet (account)</li> <li>Creates 4 events for primary account</li> <li>Check balance of primary wallet</li> <li>Transfer Ownership of first event to secondary wallet</li> <li>Check balance of primary wallet</li> <li>Check balance of secondary wallet</li> <li>Compensate (get Certificate) for second wallet's balance</li> <li>Check balance of secondary wallet</li> <li>Validate consensus of certificate (internal)</li> <li>Retrieve Gold Standard Certificate ID</li> <li>External Validation via Gold Standard Registry</li> </ol> </html>\n[![Test and Run in Postman](https://run.pstmn.io/button.svg)](https://god.gw.postman.com/run-collection/15081091-766401d6-06c2-47a3-bb3e-35aac41992d9?action=collection%2Ffork&collection-url=entityId%3D15081091-766401d6-06c2-47a3-bb3e-35aac41992d9%26entityType%3Dcollection%26workspaceId%3D9bdc41fc-ebac-4de7-96fb-4e7650494186)\n",
+    "version": "1.0",
+    "contact": {
+      "email": "dev@stromdao.com",
+      "url": "https://stromdao.de/kontakt"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "x-logo": {
+      "url": "https://corrently.de/assets/img/Corrently_1000x252.png"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.corrently.io/v2.0/co2",
+      "variables": {}
+    }
+  ],
+  "paths": {
+    "/addEvent": {
+      "post": {
+        "tags": [
+          "CO2 Event"
+        ],
+        "summary": "Basic CO2 Event",
+        "description": "",
+        "operationId": "BasicCO2Event",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded:": {
+              "encoding": {},
+              "schema": {
+                "required": [
+                  "account",
+                  "co2"
+                ],
+                "type": "object",
+                "properties": {
+                  "account": {
+                    "type": "string",
+                    "example": "0xDbFb7D59cc829A2C7a8C3136b8E8CBac965B210A"
+                  },
+                  "co2": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 10
+                  },
+                  "factor": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 135
+                  },
+                  "unit": {
+                    "type": "string",
+                    "example": "km"
+                  },
+                  "qty": {
+                    "type": "integer",
+                    "example": 15
+                  },
+                  "activity": {
+                    "type": "string",
+                    "example": "0x6dc88061c64443684EB00AaE7a43c9cf49b3Dc8915"
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "Riding a Cap"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/co2event"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/listEvents": {
+      "get": {
+        "tags": [
+          "CO2 Event"
+        ],
+        "summary": "List of Events",
+        "operationId": "co2listEvents",
+        "description": "Returns a list of Events associated to a given Account\n",
+        "parameters": [
+          {
+            "name": "account",
+            "in": "query",
+            "description": "Account ID to get List from",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0xDbFb7D59cc829A2C7a8C3136b8E8CBac965B210A"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/co2event"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/compensateAccount": {
+      "get": {
+        "tags": [
+          "CO2 Event"
+        ],
+        "summary": "List of Events",
+        "operationId": "co2compensateAccount",
+        "description": "Fully compensation of an account\n",
+        "parameters": [
+          {
+            "name": "account",
+            "in": "query",
+            "description": "Account ID to compensate",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0xDbFb7D59cc829A2C7a8C3136b8E8CBac965B210A"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/transferOwnership": {
+      "post": {
+        "tags": [
+          "CO2 Event"
+        ],
+        "summary": "Transfer Ownership of an Event to another account. So far there is no permission check.",
+        "description": "",
+        "operationId": "transferCO2EventOwner",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded:": {
+              "encoding": {},
+              "schema": {
+                "required": [
+                  "from",
+                  "to",
+                  "event"
+                ],
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "example": "0xDbFb7D59cc829A2C7a8C3136b8E8CBac965B210A"
+                  },
+                  "to": {
+                    "type": "string",
+                    "example": "0xDbFb7D59cc829A2C7a8C3136b8E8CBac965B210A"
+                  },
+                  "event": {
+                    "type": "string",
+                    "example": "0xf485d2680A3A9c89b56711D972F40797620E9885"
+                  }
+                }
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/identity": {
+      "get": {
+        "tags": [
+          "CO2 Event"
+        ],
+        "summary": "Lookup Identity Meta Information",
+        "operationId": "co2identity",
+        "description": "Allows  to retrieve identity information assigned in consensus. Available fields in result object depend on the nature of an identity.\n",
+        "parameters": [
+          {
+            "name": "account",
+            "in": "query",
+            "description": "Account ID to lookup",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0xDbFb7D59cc829A2C7a8C3136b8E8CBac965B210A"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "co2event": {
+        "description": "Unique co2 emission event",
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "string"
+          },
+          "co2eq": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "timestamp": {
+            "type": "integer"
+          },
+          "startTime": {
+            "type": "integer"
+          },
+          "endTime": {
+            "type": "integer"
+          },
+          "event": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "account": "0xDbFb7D59cc829A2C7a8C3136b8E8CBac965B210A",
+          "co2eq": "10",
+          "title": "Unspecific CO2 Emission",
+          "offset": 0,
+          "timestamp": 1633394680555,
+          "startTime": 1633394680555,
+          "endTime": 1633394680555,
+          "event": "0x7Cab030DF189c3Cd8A5329f03d38e138D472F103"
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "CO2 Event",
+      "description": "Definition of CO2 Emission events as basic structure for GHG accounting."
+    }
+  ]
+}
