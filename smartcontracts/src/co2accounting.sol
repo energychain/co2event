@@ -1,4 +1,4 @@
-// contracts/MyContract.sol
+// contracts/co2accounting.sol
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.0;
 
