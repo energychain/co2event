@@ -25,4 +25,9 @@ contract CO2Accounting is AccessControl, ERC20 {
     function compensation(address from, uint256 amount) public onlyRole(COMPENSATOR_ROLE) {
         _burn(from, amount);
     }
+
+    function transfer(address recipient, uint256 amount) public onlyRole(DEFAULT_ADMIN_ROLE) virtual override returns (bool) {
+      _transfer(_msgSender(), recipient, amount);
+      return true;
+    }
 }
