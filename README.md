@@ -1,6 +1,10 @@
 # co2event
 CO2 Emission Event Accounting and Decompensation using DLT based Identity Management Concepts (ID-Ideal AP8).
 
+[![CO2Offset](https://api.corrently.io/v2.0/ghgmanage/statusimg?host=co2event&svg=1)](https://co2offset.io/badge.html?host=co2event)
+
+
+
 ## Definitions
 | Role      | Description |
 | ----------- | ----------- |
