@@ -31,5 +31,5 @@ npm run build
 
 ### Test Smart Contract
 ```shell
-npx hardhat test ./smartcontracts/test/co2accounting.test.js
+npm test
 ```

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "waffle",
-    "test": "export NODE_ENV=test && mocha smartcontracts/test"
+    "test": "npx hardhat test ./smartcontracts/test/co2accounting.test.js"
   },
   "repository": {
     "type": "git",
