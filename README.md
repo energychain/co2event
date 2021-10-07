@@ -33,3 +33,5 @@ npm run build
 ```shell
 npm test
 ```
+![grafik](https://user-images.githubusercontent.com/37406473/136347539-03eb09f6-2620-4de7-a29c-4e25561c20ac.png)
+
