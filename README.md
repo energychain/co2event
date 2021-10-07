@@ -33,3 +33,23 @@ npm run build
 ```shell
 npm test
 ```
+![grafik](https://user-images.githubusercontent.com/37406473/136347539-03eb09f6-2620-4de7-a29c-4e25561c20ac.png)
+
+## Usecase EV-Charging (GER)
+
+![123456 drawio](https://user-images.githubusercontent.com/37406473/136455105-b984ba25-2624-4aa8-8e9a-5fed4fc09eeb.png)
+
+
+0. **Deployment des Smart Contracts und Rollenzuweisung der Teilnehmer über Wallet Adressen**
+- Messstellenbetreiber -> Emitter (Recht Burnable Token auf fremden Adressen zu emitieren)
+- Nutzer/Person -> Entity
+- Plant for the Planet -> Compensator (Recht Burnable Token auf fremden Adressen zu vernichten)
+
+1. **Nutzer führt E-Auto Beladung über 5 kWh durch**
+- Emitter 'emittiert' das CO2 Äquivalent der 5 kWh Beladung von 175g in die Wallet der Entity als Burnable Token
+
+2. **Nutzer will die Beladung Kompensieren**
+- Prüfvorgang ob Kompensation möglich ist
+
+3. **Planet for the Planet kompensiert für Nutzer**
+- Compensator vernichtet die 175 Burnable Token der Entity
