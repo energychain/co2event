@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-
 /**
  * Implements CO2 Event handling (Emission event => Compensation) with the pattern of a burnable token.
  */
@@ -13,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract CO2Accounting is AccessControl, ERC20 {
     bytes32 public constant EMITTER_ROLE = keccak256("EMITTER_ROLE");
     bytes32 public constant COMPENSATOR_ROLE = keccak256("COMPENSATOR_ROLE");
-    uint256 public constant Decimals = 0;
+
 
     constructor() ERC20("CO2G", "CO2G") {
       _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -32,5 +31,9 @@ contract CO2Accounting is AccessControl, ERC20 {
     function transfer(address recipient, uint256 amount) public onlyRole(DEFAULT_ADMIN_ROLE) virtual override returns (bool) {
       _transfer(_msgSender(), recipient, amount);
       return true;
+    }
+
+    function decimals() public view override returns (uint8) {
+        return 0;
     }
 }
