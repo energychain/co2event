@@ -35,8 +35,9 @@ npm test
 ```
 ![grafik](https://user-images.githubusercontent.com/37406473/136347539-03eb09f6-2620-4de7-a29c-4e25561c20ac.png)
 
-## Usecase EV-Charging
+## Usecase EV-Charging (GER)
 
-![grafik](https://user-images.githubusercontent.com/37406473/136357678-ce77f06c-bfaa-4b1d-829b-0a0db3aa94ac.png)
+![prozess](https://user-images.githubusercontent.com/37406473/136359247-6451e318-6708-418c-b706-7b4ad0c82c98.png)
+
 
 
