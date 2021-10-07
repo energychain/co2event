@@ -40,4 +40,16 @@ npm test
 ![prozess](https://user-images.githubusercontent.com/37406473/136359247-6451e318-6708-418c-b706-7b4ad0c82c98.png)
 
 
+0. **Deployment des Smart Contracts und Rollenzuweisung der Teilnehmer über Wallet Adressen**
+- Messstellenbetreiber -> Emitter (Recht Burnable Token auf fremden Adressen zu emitieren)
+- Nutzer/Person -> Entity
+- Plant for the Planet -> Compensator (Recht Burnable Token auf fremden Adressen zu vernichten)
 
+1. **Nutzer führt E-Auto Beladung über 5 kWh durch**
+- Emitter 'emittiert' das CO2 Äquivalent der 5 kWh Beladung von 175g in die Wallet der Entity als Burnable Token
+
+2. **Nutzer will die Beladung Kompensieren**
+- Prüfvorgang ob Kompensation möglich ist
+
+3. **Planet for the Planet kompensiert für Nutzer**
+- Compensator vernichtet die 175 Burnable Token der Entity
