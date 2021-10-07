@@ -37,7 +37,7 @@ npm test
 
 ## Usecase EV-Charging (GER)
 
-![prozess](https://user-images.githubusercontent.com/37406473/136359247-6451e318-6708-418c-b706-7b4ad0c82c98.png)
+![123456 drawio](https://user-images.githubusercontent.com/37406473/136455105-b984ba25-2624-4aa8-8e9a-5fed4fc09eeb.png)
 
 
 0. **Deployment des Smart Contracts und Rollenzuweisung der Teilnehmer über Wallet Adressen**
