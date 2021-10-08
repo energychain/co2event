@@ -8,6 +8,10 @@ module.exports = {
      hardhat: {
        gas: 2100000,
        gasPrice: 8000000000
+     },
+     corrently: {
+       url: "http://rathgeb.corrently.de:8545",
+       chainId: 6226
      }
    }
 };

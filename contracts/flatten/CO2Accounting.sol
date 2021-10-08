@@ -927,7 +927,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
 }
 
 
-// Root file: smartcontracts/src/co2accounting.sol
+// Root file: contracts/CO2Accounting.sol
 
 // contracts/co2accounting.sol
 pragma solidity ^0.8.0;

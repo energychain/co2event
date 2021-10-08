@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // contracts/co2accounting.sol
 pragma solidity ^0.8.0;
 

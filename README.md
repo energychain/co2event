@@ -14,6 +14,8 @@ CO2 Emission Event Accounting and Decompensation using DLT based Identity Manage
 
 ## Requirements
 - NPM and Node JS (V12 or greater)
+- Truffle Suite [Website](https://www.trufflesuite.com/)
+- Ganache [Website](https://www.trufflesuite.com/ganache)
 
 ## Usage
 Clone [GIT repository](https://github.com/energychain/co2event) and do basic dependency installation
@@ -22,11 +24,21 @@ Clone [GIT repository](https://github.com/energychain/co2event) and do basic dep
 git clone https://github.com/energychain/co2event.git
 cd co2event
 npm install
+npm install -g truffle
 ```
+
+Do not forget to start/run Ganache :)
 
 ### Compiling Smart-Contracts
 ```shell
 npm run build
+```
+
+### Interact with SmartContract (Deployed)
+```shell
+truffle console
+let instance = await CO2Accounting.deployed();
+instance.totalSupply();
 ```
 
 ### Test Smart Contract
