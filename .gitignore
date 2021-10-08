@@ -106,3 +106,4 @@ dist
 # Waffle
 cache/
 build/
+artifacts/

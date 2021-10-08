@@ -25,6 +25,8 @@ git clone https://github.com/energychain/co2event.git
 cd co2event
 npm install
 npm install -g truffle
+npm run build
+npm test
 ```
 
 Do not forget to start/run Ganache :)

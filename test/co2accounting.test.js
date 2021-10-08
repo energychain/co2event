@@ -2,7 +2,7 @@
 const chai = require('chai');
 const waffle = require('ethereum-waffle');
 const ethers = require("hardhat");
-const CO2Accounting = require('../build/CO2Accounting.json');
+const CO2Accounting = require('../build/contracts/CO2Accounting.json');
 
 chai.use(waffle.solidity);
 
@@ -56,7 +56,7 @@ describe('CO2Accounting', () => {
     await chai.expect(await contract.balanceOf(walletEmitter.address)).to.equal(0);
     await chai.expect(await contract.balanceOf(walletEntity.address)).to.equal(32);
     await chai.expect(await contract.balanceOf(walletCompensator.address)).to.equal(0);
-    
+
     // Run Emission Event transaction
     await contract.connect(walletCompensator).compensation(walletEntity.address,32);
 
