@@ -67,3 +67,28 @@ npm test
 
 3. **Planet for the Planet kompensiert für Nutzer**
 - Compensator vernichtet die 175 Burnable Token der Entity
+
+### DApp
+
+Prepare your environement
+
+`Start Ganache` and select Quickstart
+![Ganache Start Screen](./docs/ganache_start.png)
+
+```shell
+npm run migrate
+```
+
+Validate Results:
+```
+Summary
+=======
+> Total deployments:   2
+> Final cost:          0.05141418 ETH
+```
+
+Switch in Ganache to Transactions panel:
+![Ganache Transactions Screen](./docs/ganache_post_migration.png)
+
+Finally start Development HTTP Server:
+`cd app && npm run dev`

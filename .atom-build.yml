@@ -5,6 +5,10 @@ targets:
   flatten-smartcontracts:
     cmd: "npx waffle flatten"
   test-smartcontracts:
-    cmd: "npx hardhat test ./smartcontracts/test/co2accounting.test.js"
+    cmd: "npm run test"
   migrate-smartcontracts:
     cmd: "npm run migrate"
+  app-dev:
+    cmd: "cd app && npm run dev"
+  app-build:
+    cmd: "cd app && npm run build"
