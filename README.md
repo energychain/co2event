@@ -92,3 +92,7 @@ Switch in Ganache to Transactions panel:
 
 Finally start Development HTTP Server:
 `cd app && npm run dev`
+
+#### [DApp Use Cases](./docs/usecases_dapp.md)
+
+Implemented Use Cases with sample UI

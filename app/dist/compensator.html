@@ -45,57 +45,39 @@
         <div class="row" style="margin-bottom:35px">
           <div class="col">
             <div class="card flex-fill h-100">
-                <div class="card-header bg-primary text-light step1">
-                    <h3>Charging App</h3>
+                <div class="card-header bg-primary text-light stepCompensate1">
+                    <h3>Incorporate Gold Standard Certificate</h3>
                 </div>
                 <div class="card-body text-start flex-grow-1" id="step1" style="min-height: 200px;">
-                    <table class="table table-condensed">
-                        <tr>
-                            <td>Start</td>
-                            <td class="text-end"><span class="chargingStart">-</span></td>
-                        </tr>
-                        <tr>
-                            <td>Duration</td>
-                            <td class="text-end"><span class="chargingDuration">-</span>&nbsp;Min</td>
-                        </tr>
-                        <tr>
-                            <td>Power</td>
-                            <td class="text-end"><span class="chargingPower">-</span>&nbsp;KW</td>
-                        </tr>
-                        <tr>
-                            <td>Energy</td>
-                            <td class="text-end"><span class="chargingEnergy">-</span>&nbsp;kWh</td>
-                        </tr>
-                    </table>
+                  <form class="form lh-lg">
+                    <label For="rapidAPI">Rapid API-Key <a href="https://rapidapi.com/stromdao-stromdao-default/api/co2-offset" class="fw-lighter btn btn-sm btn-link" target='_blank'>Signup for API</a> </label>
+                    <input class="form-control" id="rapidAPI" name="rapidAPI" type="text" placeholder="(your RapidAPI Key to buy certificate)"/>
+                    <label For="rapidCO2" style="margin-top">CO<sub>2</sub>Eq in Gram in Certificate</label>
+                    <input class="form-control" value="1" id="rapidCO2" name="rapidCO2" type="number" step="1" min="1">
+                  </form>
                 </div>
                 <div class="card-footer text-center">
-                    <button class="btn btn-primary" id="btnStopCharging">Stop Charging</button>
+                    <button class="btn btn-primary" id="btnBuyCertificate">Buy Certificate</button>
                 </div>
               </div>
           </div>
           <div class="col">
             <div class="card flex-fill h-100">
-                <div class="card-header bg-dark text-light step2">
-                    <h3>Oracle / Tx Preperation by MPO</h3>
+                <div class="card-header bg-dark text-light stepCompensate2">
+                    <h3>Tx Preperation by Compensator</h3>
                 </div>
                 <div class="card-body text-start flex-grow-1" id="step1" style="min-height: 200px;">
-                    <table class="table table-condensed">
-                        <tr>
-                            <td>Emission Factor</td>
-                            <td class="text-end"><span class="eventEmissionFactor">-</span>g/kWh</td>
-                        </tr>
-                        <tr>
-                            <td>CO<sub>2</sub>Emission</td>
-                            <td class="text-end"><span class="eventEmission">-</span>g</td>
-                        </tr>
-                        <tr>
-                            <td>Issue to</td>
-                            <td class="text-end"><input type="text" class="form-control account" disabled="disabled"></td>
-                        </tr>
-                    </table>
+                    <form class="form lh-lg">
+                            <label For="compensateFor">Compensate for</td>
+                            <input type="text" class="form-control account w-100" disabled="disabled" id="compensateFor" name="compensateFor">
+                            <label For="compensateCertificate">Using Certificate</td>
+                            <input type="text" class="form-control w-100" disabled="disabled" value="0x4c17171975052eDA904C41c687088c864764F6Ff" id="compensateCertificate" name="compensateCertificate">
+                            <label For="compensateCO2eq" style="margin-top">CO<sub>2</sub>Eq in Gram to Compensate</label>
+                            <input class="form-control" value="0" id="compensateCO2eq" name="compensateCO2eq" type="number" step="1" min="1">
+                    </form>
                 </div>
                 <div class="card-footer text-center">
-                    <button class="btn btn-primary" id="btnTxSubmit" disabled="disabled">Transmit Transaction</button>
+                    <button class="btn btn-primary" id="btnTxCompensateSubmit" disabled="disabled">Transmit Transaction</button>
                 </div>
               </div>
           </div>

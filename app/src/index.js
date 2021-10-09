@@ -1,4 +1,6 @@
 import CO2Accounting from "../../build/contracts/CO2Accounting.json";
+import CO2CertRegistry from "../../build/contracts/CO2CertRegistry.json";
+
 const mockUpKeys = {
   'admin': {
     account:'0xD0FB2327EC99AF3F7b2762D75DD6d4790Cfaca74',
@@ -23,20 +25,27 @@ $(document).ready( async () => {
   const signer = provider.getSigner();
   const chainId = 5777;
   let instance = {};
+  let certRegistry = {};
 
   try {
     const deployedNetwork = CO2Accounting.networks[chainId];
     instance = new ethers.Contract( deployedNetwork.address , CO2Accounting.abi , signer )
+    const deployedNetworkRegistry = CO2CertRegistry.networks[chainId];
+    certRegistry = new ethers.Contract( deployedNetworkRegistry.address , CO2CertRegistry.abi , signer )
   } catch (error) {
     console.error("Could not connect to contract or chain.",error);
   }
-  const walletEmitter = new ethers.Wallet(mockUpKeys.mpo.privateKey,provider);
 
-  const compensate = async function() {
+  // Wallet Setup
+  const walletEmitter = new ethers.Wallet(mockUpKeys.mpo.privateKey,provider);
+  const walletCompensator = new ethers.Wallet(mockUpKeys.compensator.privateKey,provider);
+
+  const buyGSCertificate = async function() {
+    return new Promise(async function (resolve, reject) {
       const settings = {
       	"async": true,
       	"crossDomain": true,
-      	"url": "https://co2-offset.p.rapidapi.com/rapidapi/compensate?gram=16",
+      	"url": "https://co2-offset.p.rapidapi.com/rapidapi/compensate?gram="+$('#rapidCO2').val(),
       	"method": "GET",
       	"headers": {
       		"x-rapidapi-host": "co2-offset.p.rapidapi.com",
@@ -44,9 +53,10 @@ $(document).ready( async () => {
       	}
       };
 
-      $.ajax(settings).done(function (response) {
-      	console.log(response);
+      await $.ajax(settings).done(function (response) {
+        resolve(response);
       });
+    });
   };
 
   const renderStats = async function() {
@@ -90,6 +100,24 @@ $(document).ready( async () => {
     window.location.reload();
   }
 
+  const buyCertificate = async function() {
+    $('#btnBuyCertificate').attr('disabled','disabled');
+    $('.stepCompensate1').removeClass("bg-primary").addClass("bg-dark");
+    const buyResult = await buyGSCertificate();
+    const certificate = buyResult.certificate;
+    console.log(await certRegistry.connect(walletCompensator).addCertificate(certificate.compensation,certificate.co2requested));
+    $('#compensateCertificate').val(certificate.compensation);
+    $('#compensateCO2eq').val(certificate.co2requested);
+    $('#btnTxCompensateSubmit').removeAttr('disabled');
+    $('.stepCompensate2').removeClass("bg-dark").addClass("bg-primary");
+  }
+
+  const compensateUser = async function() {
+      $('#btnTxCompensateSubmit').attr('disabled','disabled');
+      console.log(await certRegistry.connect(walletCompensator).compensate(instance.address,$('#compensateCertificate').val(),$('#compensateFor').val(),$('#compensateCO2eq').val()));
+      $('#btnTxCompensateSubmit').removeAttr('disabled');
+  }
+
   provider.on("network", (newNetwork, oldNetwork) => {
       if (oldNetwork) {
           window.location.reload();
@@ -109,7 +137,9 @@ $(document).ready( async () => {
   renderStats();
 
   $('#btnTxSubmit').click(transmitTx);
+  $('#btnBuyCertificate').click(buyCertificate);
   $('#btnStopCharging').click(stopCharging);
+  $('#btnTxCompensateSubmit').click(compensateUser);
   $('.account').val(await signer.getAddress());
 
 })
