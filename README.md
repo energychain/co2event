@@ -16,6 +16,7 @@ ensure a net Zero GHG emission for e-Mobility charging
 - complexity of reporting gets lowered (fleet sum = Zero Emission)
 - market abitrage for compensation could be leveraged
 - cost of environmental management gets lowered   
+- continuous GHG auditing becomes possible
 
 ## Definitions
 | Role      | Description |
