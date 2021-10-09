@@ -5,6 +5,17 @@
 
 The ISO 14064 standard is part of the ISO 14000 series of International Standards for environmental management. The ISO 14064 standard provides governments, businesses, regions and other organisations with a complementary set of tools for programs to quantify, monitor, report and verify greenhouse gas emissions. The ISO 14064 standard supports organisations to participate in both regulated and voluntary programs such as emissions trading schemes and public reporting using a globally recognised standard.
 
+## Business Case
+
+E-mobility allows us to move away from CO2-emitting fossil fuels towards energy supplied from electrical power sources which are, in turn, charged through the electricity grid. By decarbonizing the transport sector, electromobility will create a cleaner, healthier and more affordable future for everyone.
+
+However taking electricity from the grid is not CO2 neutral due to the grid losses, even if 100% renewable generation is used. Further it changes over time as the generation mix and the distance between generation and consumption changes.
+
+### IF we
+ensure a net Zero GHG emission for e-Mobility charging
+- complexity of reporting gets lowered (fleet sum = Zero Emission)
+- market abitrage for compensation could be leveraged
+- cost of environmental management gets lowered   
 
 ## Definitions
 | Role      | Description |
