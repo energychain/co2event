@@ -1,5 +1,5 @@
 # co2event
-** GHG accounting and decompensation using DLT based Identity Management concepts (ID-Ideal AP8) in accordance to ISO14064-3. Usage domain: E-Mobility, Car-Charging **
+**GHG accounting and decompensation using DLT based Identity Management concepts (ID-Ideal AP8) in accordance to ISO14064-3. Usage domain: E-Mobility, Car-Charging**
 
 [![CO2Offset](https://api.corrently.io/v2.0/ghgmanage/statusimg?host=co2event&svg=1)](https://co2offset.io/badge.html?host=co2event)
 
