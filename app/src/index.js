@@ -32,6 +32,23 @@ $(document).ready( async () => {
   }
   const walletEmitter = new ethers.Wallet(mockUpKeys.mpo.privateKey,provider);
 
+  const compensate = async function() {
+      const settings = {
+      	"async": true,
+      	"crossDomain": true,
+      	"url": "https://co2-offset.p.rapidapi.com/rapidapi/compensate?gram=16",
+      	"method": "GET",
+      	"headers": {
+      		"x-rapidapi-host": "co2-offset.p.rapidapi.com",
+      		"x-rapidapi-key": $('#rapidAPI').val()
+      	}
+      };
+
+      $.ajax(settings).done(function (response) {
+      	console.log(response);
+      });
+  };
+
   const renderStats = async function() {
     $('.dltBlockNumber').html(provider._lastBlockNumber);
     $('.dltConnection').html(provider.connection.url);
