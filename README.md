@@ -14,11 +14,11 @@
     + [Test Smart Contract](#test-smart-contract)
     + [DApp](#dapp)
   * [Usecase EV-Charging (GER)](#usecase-ev-charging--ger-)
-    + [[Implementierung in DAPP](./docs/usecases_dapp.md)](#-implementierung-in-dapp---docs-usecases-dappmd-)
+    + [Implementierung in DAPP](./docs/usecases_dapp.md)
   * [Maintainer / Imprint](#maintainer---imprint)
   * [LICENSE](#license)
 
-  
+
 The ISO 14064 standard is part of the ISO 14000 series of International Standards for environmental management. The ISO 14064 standard provides governments, businesses, regions and other organisations with a complementary set of tools for programs to quantify, monitor, report and verify greenhouse gas emissions. The ISO 14064 standard supports organisations to participate in both regulated and voluntary programs such as emissions trading schemes and public reporting using a globally recognised standard.
 
 ## Business Case
