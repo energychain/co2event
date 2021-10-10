@@ -3,6 +3,22 @@
 
 [![CO2Offset](https://api.corrently.io/v2.0/ghgmanage/statusimg?host=co2event&svg=1)](https://co2offset.io/badge.html?host=co2event)
 
+- [co2event](#co2event)
+  * [Business Case](#business-case)
+    + [IF we](#if-we)
+  * [Definitions](#definitions)
+  * [Requirements](#requirements)
+  * [Usage](#usage)
+    + [Compiling Smart-Contracts](#compiling-smart-contracts)
+    + [Interact with SmartContract (Deployed)](#interact-with-smartcontract--deployed-)
+    + [Test Smart Contract](#test-smart-contract)
+    + [DApp](#dapp)
+  * [Usecase EV-Charging (GER)](#usecase-ev-charging--ger-)
+    + [[Implementierung in DAPP](./docs/usecases_dapp.md)](#-implementierung-in-dapp---docs-usecases-dappmd-)
+  * [Maintainer / Imprint](#maintainer---imprint)
+  * [LICENSE](#license)
+
+  
 The ISO 14064 standard is part of the ISO 14000 series of International Standards for environmental management. The ISO 14064 standard provides governments, businesses, regions and other organisations with a complementary set of tools for programs to quantify, monitor, report and verify greenhouse gas emissions. The ISO 14064 standard supports organisations to participate in both regulated and voluntary programs such as emissions trading schemes and public reporting using a globally recognised standard.
 
 ## Business Case
@@ -62,25 +78,6 @@ npm test
 ```
 ![grafik](https://user-images.githubusercontent.com/37406473/136347539-03eb09f6-2620-4de7-a29c-4e25561c20ac.png)
 
-## Usecase EV-Charging (GER)
-
-![123456 drawio](https://user-images.githubusercontent.com/37406473/136455105-b984ba25-2624-4aa8-8e9a-5fed4fc09eeb.png)
-
-
-0. **Deployment des Smart Contracts und Rollenzuweisung der Teilnehmer über Wallet Adressen**
-- Messstellenbetreiber -> Emitter (Recht Burnable Token auf fremden Adressen zu emitieren)
-- Nutzer/Person -> Entity
-- Plant for the Planet -> Compensator (Recht Burnable Token auf fremden Adressen zu vernichten)
-
-1. **Nutzer führt E-Auto Beladung über 5 kWh durch**
-- Emitter 'emittiert' das CO2 Äquivalent der 5 kWh Beladung von 175g in die Wallet der Entity als Burnable Token
-
-2. **Nutzer will die Beladung Kompensieren**
-- Prüfvorgang ob Kompensation möglich ist
-
-3. **Planet for the Planet kompensiert für Nutzer**
-- Compensator vernichtet die 175 Burnable Token der Entity
-
 ### DApp
 
 Prepare your environement
@@ -105,8 +102,26 @@ Switch in Ganache to Transactions panel:
 
 Finally start Development HTTP Server:
 `cd app && npm run dev`
+## Usecase EV-Charging (GER)
 
-### [Use Cases](./docs/usecases_dapp.md)
+![123456 drawio](https://user-images.githubusercontent.com/37406473/136455105-b984ba25-2624-4aa8-8e9a-5fed4fc09eeb.png)
+
+
+0. **Deployment des Smart Contracts und Rollenzuweisung der Teilnehmer über Wallet Adressen**
+- Messstellenbetreiber -> Emitter (Recht Burnable Token auf fremden Adressen zu emitieren)
+- Nutzer/Person -> Entity
+- Plant for the Planet -> Compensator (Recht Burnable Token auf fremden Adressen zu vernichten)
+
+1. **Nutzer führt E-Auto Beladung über 5 kWh durch**
+- Emitter 'emittiert' das CO2 Äquivalent der 5 kWh Beladung von 175g in die Wallet der Entity als Burnable Token
+
+2. **Nutzer will die Beladung Kompensieren**
+- Prüfvorgang ob Kompensation möglich ist
+
+3. **Planet for the Planet kompensiert für Nutzer**
+- Compensator vernichtet die 175 Burnable Token der Entity
+
+### [Implementierung in DAPP](./docs/usecases_dapp.md)
 
 Implemented Use Cases with sample UI
 
