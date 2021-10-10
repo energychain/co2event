@@ -20,7 +20,7 @@ const renderHTMLEvents = function(events,totalName) {
     let html = '<table class="table">'
     html += '<tr>';
     html += '<th>Block Number</th>';
-    html += '<th class="text-end">CO<sub>2</sub>eq (Grams)</th>';
+    html += '<th class="text-end">CO<sub>2</sub>eq (g)</th>';
     html += '</tr>';
     let total=0;
     for(let i=0;i<events.length;i++) {
@@ -34,6 +34,24 @@ const renderHTMLEvents = function(events,totalName) {
     html += '</table>';
 
     return {html:html,sum:total};
+}
+
+const parseMustache = function (str, obj) {
+  return str.replace(/{{\s*([\w\.]+)\s*}}/g, function(tag, match) {
+    var nodes = match.split("."),
+      current = obj,
+      length = nodes.length,
+      i = 0;
+    while (i < length) {
+      try {
+        current = current[nodes[i]];
+      } catch (e) {
+        return "";
+      }
+      i++;
+    }
+    return current;
+  });
 }
 
 $(document).ready( async () => {
@@ -124,6 +142,96 @@ $(document).ready( async () => {
     $('.accountTx').html(await provider.getTransactionCount(await signer.getAddress()));
     $('.mpoTx').html(await provider.getTransactionCount(walletEmitter.address));
     $('.accountCO2').html((await instance.balanceOf(await signer.getAddress())).toString());
+    let totalSupply = (await instance.totalSupply()).toString() * 1;
+    let totalCertified = (await certRegistry.totalCertified()).toString() * 1;
+    let totalEmission =  (await instance.totalEmission()).toString() * 1;
+    let totalCompensation =  (await instance.totalCompensation()).toString() * 1;
+    if(location.pathname.indexOf("consensus.html")>-1) {
+        await $.ajax({
+          url:"./img/consensus_frame.svg",
+          type:'GET',
+          dataType:'text'
+          }).done(function(response) {
+            response = response.substr(response.indexOf("<svg"));
+            window.datasvg = response;
+        });
+        if(typeof window.datasvg !== 'undefined') {
+          let data = {
+            EMISSION:totalEmission,
+            FLOATING:totalSupply.toString(),
+            ACQUIRED:totalCertified.toString(),
+            COMPENSATED:totalCompensation.toString(),
+            BLOCK:provider._lastBlockNumber
+          };
+          $('#consensusSVG').html(parseMustache(window.datasvg,data));
+        }
+        let html = '<table class="table table-condensed">'
+        html += '<tr>';
+        html += '<th>Certificate</th>';
+        html += '<th class="text-end">Certified</th>';
+        html += '<th class="text-end">Remaining</th>';
+        html += '</tr>';
+        const filterCertificates = certRegistry.filters.ExternalCertificate();
+        let certificates = await certRegistry.queryFilter(filterCertificates);
+        for(let i=0;i<certificates.length;i++) {
+          let cert = await certRegistry.certificates(certificates[i].args[0]);
+          html += '<tr>';
+          html += '<td><button type="button" data="' + certificates[i].args[0] + '" class="btn btn-sm btn-light btn-details">' + certificates[i].args[0] + '</button></td>';
+          html += '<td class="text-end">' + certificates[i].args[1].toString() + '</td>';
+          html += '<td class="text-end">' + cert[0].toString() + '</td>';
+          html += '</tr>';
+        }
+        html += '</table>';
+        $('.extConsensus').html(html);
+        $('.btn-details').unbind();
+        $('.btn-details').click(function() {
+          let certificate = $(this).attr('data');
+          $.getJSON("https://api.corrently.io/v2.0/co2/certificate?compensation="+certificate,function(data) {    
+            $('#rowDetails').show();
+            let html = '<table class="table table-condensed table-striped" style="margin-bottom:35px">';
+            html += '<tr><td><strong>Verified Carbon Standard Certificate (VCS)</strong></td><td class="text-end">'+data.certificate.tree+'</td></tr>';
+            html += '<tr><td>&nbsp;&nbsp;Location (Meta)</td><td class="text-end">'+data.certificate.meta+'</td></tr>';
+            html += '<tr><td>&nbsp;&nbsp;Partner</td><td class="text-end">'+data.certificate.issuer+'</td></tr>';
+            html += '<tr><td>&nbsp;&nbsp;Actual CO<sub>2</sub> in Transaction</td><td class="text-end">'+data.co2+'</td></tr>';
+            html += '<tr><td><strong>Gold Standard Credit Certificate (GSC)</strong></td><td class="text-end">'+data.gsc.tx.from+'</td></tr>';
+            html += '<tr><td>&nbsp;&nbsp;Type Note</td><td class="text-end">'+data.gsc.note+'</td></tr>';
+            html += '<tr><td>&nbsp;&nbsp;Actual CO<sub>2</sub> in Transaction</td><td class="text-end">'+data.gsc.tx.co2+'</td></tr>';
+            html += '</table><h4>Gold Standard Registry Data</h4><div id="gsregdata"></div>';
+            $('.detailsConsensus').html(html);
+            $('#detailsID').html(certificate);
+            $.getJSON("https://api.corrently.io/v2.0/co2/identity?account="+data.gsc.tx.from,function(dataID) {
+                $.getJSON("https://api.corrently.io/v2.0/co2/goldstandard/credits?query="+dataID.serial_number,function(dataGS) {
+                    if(Array.isArray(dataGS)) dataGS = dataGS[0];
+
+                    let html2 = '<table class="table table-condensed table-striped" style="margin-bottom:35px">';
+                    html2 += '<tr><td><strong>Serial Number</strong></td><td class="text-end">'+dataID.serial_number+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Created At</td><td class="text-end">'+dataGS.created_at+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Updated At</td><td class="text-end">'+dataGS.updated_at+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Number of Credits (tones)</td><td class="text-end">'+dataGS.number_of_credits+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Starting Credit Number</td><td class="text-end">'+dataGS.starting_credit_number+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Ending Credit Number</td><td class="text-end">'+dataGS.ending_credit_number+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Batch Number</td><td class="text-end">'+dataGS.batch_number+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Certified Date</td><td class="text-end">'+dataGS.certified_date+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Start Monitored Period</td><td class="text-end">'+dataGS.monitoring_period_start_date+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;End Monitored Period</td><td class="text-end">'+dataGS.monitoring_period_end_date+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Vintage</td><td class="text-end">'+dataGS.vintage+'</td></tr>';
+                    html2 += '<tr><td><strong>Project</strong></td><td class="text-end">'+dataGS.project.id+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Name</td><td class="text-end"><a href="'+dataGS.project.sustaincert_url+'" target="_blank">'+dataGS.project.name+'</a></td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Created At</td><td class="text-end">'+dataGS.project.created_at+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Description</td><td class="text-end">'+dataGS.project.description+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Methodology</td><td class="text-end">'+dataGS.project.methodology+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Type</td><td class="text-end">'+dataGS.project.type+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Country</td><td class="text-end">'+dataGS.project.country+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Carbon Stream</td><td class="text-end">'+dataGS.project.carbon_stream+'</td></tr>';
+                    html2 += '<tr><td>&nbsp;&nbsp;Programme</td><td class="text-end">'+dataGS.project.programme_of_activities+'</td></tr>';
+                    html2 += '</table>'
+                    $('#gsregdata').html(html2);
+                });
+            });
+          });
+        });
+
+    }
   }
 
   const renderChargingEvent = function() {
@@ -167,6 +275,7 @@ $(document).ready( async () => {
     $('#compensateCO2eq').val(certificate.co2requested);
     $('#btnTxCompensateSubmit').removeAttr('disabled');
     $('.stepCompensate2').removeClass("bg-dark").addClass("bg-primary");
+    window.location.reload();
   }
 
   const compensateUser = async function() {

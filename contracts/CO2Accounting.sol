@@ -12,6 +12,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract CO2Accounting is AccessControl, ERC20 {
     bytes32 public constant EMITTER_ROLE = keccak256("EMITTER_ROLE");
     bytes32 public constant COMPENSATOR_ROLE = keccak256("COMPENSATOR_ROLE");
+    uint256 public totalEmission = 0;
+    uint256 public totalCompensation = 0;
 
     event Emission(address to, uint256 amount);
     event Compensation(address from, uint256 amount);
@@ -25,11 +27,13 @@ contract CO2Accounting is AccessControl, ERC20 {
 
     function emission(address to, uint256 amount) public onlyRole(EMITTER_ROLE) {
         _mint(to, amount);
+        totalEmission += amount;
         emit Emission(to, amount);
     }
 
     function compensation(address from, uint256 amount) public onlyRole(COMPENSATOR_ROLE) {
         _burn(from, amount);
+        totalCompensation += amount;
         emit Compensation(from,amount);
     }
 

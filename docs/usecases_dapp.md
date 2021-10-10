@@ -28,4 +28,10 @@ Compensator gets an CO2 Offset activity audited. In accordance to the rules of G
 
 Pressing the `Buy Certificate` button, a new certificate (Gold Standard Credit, VER) will be bought via an API call. This certificate gets available at an internal ID represented in the `Using Certificate` field.
 
-This certificate field could now be transfered by the Compensator in total or in spares to an Entity. 
+This certificate field could now be transfered by the Compensator in total or in spares to an Entity.
+
+## UC3: Automated Audit
+
+![Step1 UI](./uc_3_consensus.png)
+
+At any given time an audit of the system should be possible.
