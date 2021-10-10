@@ -7,6 +7,9 @@ import "./CO2Accounting.sol";
 
 contract CO2CertRegistry is AccessControl {
 
+   event ExternalCertificate(address externalcertificate,uint co2eq);
+   event Compensation(CO2Accounting co2event,address certificate,address entity,uint co2eq);
+
    struct Spares {
         uint256 co2eq;
         address entity;
@@ -30,6 +33,7 @@ contract CO2CertRegistry is AccessControl {
         certificates[certificate].co2eq = co2eq;
         certificates[certificate].externalId = certificate;
         // certificates[certificate].spares = [];
+        emit ExternalCertificate(certificate,co2eq);
         return true;
     }
 
@@ -42,5 +46,6 @@ contract CO2CertRegistry is AccessControl {
                 entity: entity
          }));
          co2event.compensation(entity,co2eq);
+         emit Compensation(co2event,certificate,entity,co2eq);
      }
 }

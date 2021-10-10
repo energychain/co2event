@@ -9,7 +9,10 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
   },
   plugins: [
-    new CopyWebpackPlugin([{ from: "./src/index.html", to: "index.html" },{ from: "./src/compensator.html", to: "compensator.html" }]),
+    new CopyWebpackPlugin([
+      { from: "./src/index.html", to: "index.html" },
+      { from: "./src/compensator.html", to: "compensator.html" },
+      { from: "./src/balance.html", to: "balance.html" }]),
   ],
   devServer: { contentBase: path.join(__dirname, "dist"), compress: true },
 };

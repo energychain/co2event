@@ -7,12 +7,152 @@
 
     <!-- Bootstrap CSS -->
     <link href="./css/bootstrap.min.css" rel="stylesheet" integrity="sha384-uWxY/CJNBR+1zjPWmfnSnVxwRheevXITnMqoEIeG1LJrdI0GlVs/9cVSyPYXdcSF" crossorigin="anonymous">
-
+    <script src="./js/jquery.js"></script>
     <title>ID-Ideal AP8 - CO2Accounting</title>
   </head>
   <body>
-    <h1>Hello, world!</h1>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-lg">
+      <div class="container-fluid">
+        <img src="./img/idideal.png" class="img-thumbnail img-fluid" title="CO2Accounting">
+        <a class="navbar-brand" href="./"></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                eMobility Prototype
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="./index.html">Charging Event</a></li>
+                <li><a class="dropdown-item" href="./balance.html">GHG Balance Sheet</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item selected" href="./compensator.html">Compensator</a></li>
+              </ul>
+            </li>
+          </ul>
+          <form class="d-flex">
+            <div class="input-group mb-3">
+               <span class="input-group-text">@</span>
+                <input class="form-control me-2 account" disabled="disabled" type="text" placeholder="loading..." aria-label="account" id="account">
+            </div>
+          </form>
+        </div>
+      </div>
+    </nav>
+    <section id="charger" style="margin-top:150px;" class="clean-block">
+      <div class="container text-start">
+        <div class="row" style="margin-bottom:35px">
+          <div class="col">
+            <div class="card flex-fill h-100">
+                <div class="card-header bg-primary text-light step1">
+                    <h3>Charging App</h3>
+                </div>
+                <div class="card-body text-start flex-grow-1" id="step1" style="min-height: 200px;">
+                    <table class="table table-condensed">
+                        <tr>
+                            <td>Start</td>
+                            <td class="text-end"><span class="chargingStart">-</span></td>
+                        </tr>
+                        <tr>
+                            <td>Duration</td>
+                            <td class="text-end"><span class="chargingDuration">-</span>&nbsp;Min</td>
+                        </tr>
+                        <tr>
+                            <td>Power</td>
+                            <td class="text-end"><span class="chargingPower">-</span>&nbsp;KW</td>
+                        </tr>
+                        <tr>
+                            <td>Energy</td>
+                            <td class="text-end"><span class="chargingEnergy">-</span>&nbsp;kWh</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-footer text-center">
+                    <button class="btn btn-primary" id="btnStopCharging">Stop Charging</button>
+                </div>
+              </div>
+          </div>
+          <div class="col">
+            <div class="card flex-fill h-100">
+                <div class="card-header bg-dark text-light step2">
+                    <h3>Oracle / Tx Preperation by MPO</h3>
+                </div>
+                <div class="card-body text-start flex-grow-1" id="step1" style="min-height: 200px;">
+                    <table class="table table-condensed">
+                        <tr>
+                            <td>Emission Factor</td>
+                            <td class="text-end"><span class="eventEmissionFactor">-</span>g/kWh</td>
+                        </tr>
+                        <tr>
+                            <td>CO<sub>2</sub>Emission</td>
+                            <td class="text-end"><span class="eventEmission">-</span>g</td>
+                        </tr>
+                        <tr>
+                            <td>Issue to</td>
+                            <td class="text-end"><input type="text" class="form-control account" disabled="disabled"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="card-footer text-center">
+                    <button class="btn btn-primary" id="btnTxSubmit" disabled="disabled">Transmit Transaction</button>
+                </div>
+              </div>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom:35px;">
+          <div class="col">
+            <div class="card flex-fill h-100">
+                <div class="card-header bg-secondary text-light">
+                    <h3>Consensus / Ledger</h3>
+                </div>
+                <div class="card-body text-start flex-grow-1" style="min-height: 200px;">
+                  <h4>Ledger</h4>
+                  <table class="table table-striped">
+                    <tr>
+                        <td>Block Number</td>
+                        <td class="text-end"><span class="dltBlockNumber"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Connection</td>
+                        <td class="text-end"><span class="dltConnection"></span></td>
+                    </tr>
+                  </table>
+                  <h4>User/Wallet</h4>
+                  <table class="table table-striped">
+                    <tr>
+                        <td>ETH Balance</td>
+                        <td class="text-end"><span class="accountBalance"></span></td>
+                    </tr>
+                    <tr>
+                        <td>TX Count</td>
+                        <td class="text-end"><span class="accountTx"></span></td>
+                    </tr>
+                    <tr>
+                        <td>CO2eq</td>
+                        <td class="text-end"><span class="accountCO2"></span>&nbsp;g</td>
+                    </tr>
+                  </table>
+                  <h4>MPO</h4>
+                  <table class="table table-striped">
+                    <tr>
+                        <td>ETH Balance</td>
+                        <td class="text-end"><span class="mpoBalance"></span></td>
+                    </tr>
+                    <tr>
+                        <td>TX Count</td>
+                        <td class="text-end"><span class="mpoTx"></span></td>
+                    </tr>
+                  </table>
+                </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
     <script src="./js/bootstrap.bundle.min.js" integrity="sha384-kQtW33rZJAHjgefvhyyzcGF3C5TFyBQBA13V1RKPf4uH+bwyzQxZ6CmMZHmNBEfJ" crossorigin="anonymous"></script>
-    <script src="./app.js"></script>
+    <script src="./index.js"></script>
   </body>
 </html>

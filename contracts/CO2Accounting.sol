@@ -13,6 +13,9 @@ contract CO2Accounting is AccessControl, ERC20 {
     bytes32 public constant EMITTER_ROLE = keccak256("EMITTER_ROLE");
     bytes32 public constant COMPENSATOR_ROLE = keccak256("COMPENSATOR_ROLE");
 
+    event Emission(address to, uint256 amount);
+    event Compensation(address from, uint256 amount);
+    event Congestion(address recipient, uint256 amount);
 
     constructor() ERC20("CO2G", "CO2G") {
       _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -22,14 +25,17 @@ contract CO2Accounting is AccessControl, ERC20 {
 
     function emission(address to, uint256 amount) public onlyRole(EMITTER_ROLE) {
         _mint(to, amount);
+        emit Emission(to, amount);
     }
 
     function compensation(address from, uint256 amount) public onlyRole(COMPENSATOR_ROLE) {
         _burn(from, amount);
+        emit Compensation(from,amount);
     }
 
     function transfer(address recipient, uint256 amount) public onlyRole(DEFAULT_ADMIN_ROLE) virtual override returns (bool) {
       _transfer(_msgSender(), recipient, amount);
+      emit Congestion(recipient, amount);
       return true;
     }
 

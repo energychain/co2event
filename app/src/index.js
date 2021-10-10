@@ -16,6 +16,25 @@ const mockUpKeys = {
   }
 }
 
+const renderHTMLEvents = function(events,totalName) {
+    let html = '<table class="table">'
+    html += '<tr>';
+    html += '<th>Block Number</th>';
+    html += '<th class="text-end">CO<sub>2</sub>eq (Grams)</th>';
+    html += '</tr>';
+    let total=0;
+    for(let i=0;i<events.length;i++) {
+      html += '<tr>';
+      html += '<td>' + events[i].blockNumber + '</td>';
+      html += '<td class="text-end">' + events[i].args[1].toString() + '</td>';
+      html += '</tr>';
+      total += 1 * events[i].args[1].toString();
+    }
+    html += '<tr><td><strong>Total '+totalName+'</strong></td><td class="text-end">'+total+"</td></tr>";
+    html += '</table>';
+    return html;
+}
+
 $(document).ready( async () => {
 
   const ethers = require("ethers");
@@ -32,6 +51,21 @@ $(document).ready( async () => {
     instance = new ethers.Contract( deployedNetwork.address , CO2Accounting.abi , signer )
     const deployedNetworkRegistry = CO2CertRegistry.networks[chainId];
     certRegistry = new ethers.Contract( deployedNetworkRegistry.address , CO2CertRegistry.abi , signer )
+
+
+    /** Setup Event Listening **/
+    provider.on('block',function(data) {
+      $('.blocknumber').html(data);
+    })
+
+    const filterMyEmissions = instance.filters.Emission(provider.address);
+    let liabilities = await instance.queryFilter(filterMyEmissions);
+    $('.tblLiabilities').html(renderHTMLEvents(liabilities,'Liabilities'));
+
+    const filterMyCompensation = instance.filters.Compensation(provider.address);
+    let assets = await instance.queryFilter(filterMyCompensation);
+    $('.tblAssets').html(renderHTMLEvents(assets,'Assets'));
+
   } catch (error) {
     console.error("Could not connect to contract or chain.",error);
   }
