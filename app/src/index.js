@@ -32,7 +32,8 @@ const renderHTMLEvents = function(events,totalName) {
     }
     html += '<tr><td><strong>Total '+totalName+'</strong></td><td class="text-end">'+total+"</td></tr>";
     html += '</table>';
-    return html;
+
+    return {html:html,sum:total};
 }
 
 $(document).ready( async () => {
@@ -60,11 +61,30 @@ $(document).ready( async () => {
 
     const filterMyEmissions = instance.filters.Emission(provider.address);
     let liabilities = await instance.queryFilter(filterMyEmissions);
-    $('.tblLiabilities').html(renderHTMLEvents(liabilities,'Liabilities'));
+    const statsLiabilities = renderHTMLEvents(liabilities,'Liabilities');
+    $('.tblLiabilities').html(statsLiabilities.html);
 
     const filterMyCompensation = instance.filters.Compensation(provider.address);
     let assets = await instance.queryFilter(filterMyCompensation);
-    $('.tblAssets').html(renderHTMLEvents(assets,'Assets'));
+    const statsAssets = renderHTMLEvents(assets,'Assets');
+    $('.tblAssets').html(statsAssets.html);
+
+    const filterCertificates = certRegistry.filters.ExternalCertificate();
+    let certificates = await certRegistry.queryFilter(filterCertificates);
+    let html = '';
+    for(let i=0;i<certificates.length;i++) {
+      html += '<li>';
+      html += '<button type="button" class="btn btn-sm btn-primary useCertificate" data="'+certificates[i].args[0].toString()+'">'+certificates[i].args[0].toString() + '<span class="badge bg-success">'+certificates[i].args[1].toString()+'g</span></button>';
+      html += '</li>';
+    }
+    $('.certificatesList').html(html);
+    $('.useCertificate').click(function(e) {
+        $('#compensateCertificate').val($(this).attr('data'));
+        $('#btnBuyCertificate').attr('disabled','disabled');
+        $('.stepCompensate1').removeClass("bg-primary").addClass("bg-dark");
+        $('#btnTxCompensateSubmit').removeAttr('disabled');
+        $('.stepCompensate2').removeClass("bg-dark").addClass("bg-primary");
+    });
 
   } catch (error) {
     console.error("Could not connect to contract or chain.",error);
