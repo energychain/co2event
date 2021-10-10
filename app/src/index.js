@@ -73,13 +73,16 @@ $(document).ready( async () => {
     let certificates = await certRegistry.queryFilter(filterCertificates);
     let html = '';
     for(let i=0;i<certificates.length;i++) {
+      let remainingCo2 = await certRegistry.certificates(certificates[i].args[0]);
       html += '<li>';
-      html += '<button type="button" class="btn btn-sm btn-primary useCertificate" data="'+certificates[i].args[0].toString()+'">'+certificates[i].args[0].toString() + '<span class="badge bg-success">'+certificates[i].args[1].toString()+'g</span></button>';
+      html += '<button type="button" class="btn btn-sm btn-primary useCertificate" data-remain="'+remainingCo2[0].toString()+'" data="'+certificates[i].args[0].toString()+'">'+certificates[i].args[0].toString() + '<span class="badge bg-success">'+remainingCo2[0]+'/'+certificates[i].args[1].toString()+'g</span></button>';
       html += '</li>';
     }
     $('.certificatesList').html(html);
     $('.useCertificate').click(function(e) {
         $('#compensateCertificate').val($(this).attr('data'));
+        $('#compensateCO2eq').val($(this).attr('data-remain'));
+        $('.useCertificate').attr('disabled','disabled');
         $('#btnBuyCertificate').attr('disabled','disabled');
         $('.stepCompensate1').removeClass("bg-primary").addClass("bg-dark");
         $('#btnTxCompensateSubmit').removeAttr('disabled');
@@ -170,6 +173,7 @@ $(document).ready( async () => {
       $('#btnTxCompensateSubmit').attr('disabled','disabled');
       console.log(await certRegistry.connect(walletCompensator).compensate(instance.address,$('#compensateCertificate').val(),$('#compensateFor').val(),$('#compensateCO2eq').val()));
       $('#btnTxCompensateSubmit').removeAttr('disabled');
+      window.location.reload();
   }
 
   provider.on("network", (newNetwork, oldNetwork) => {
