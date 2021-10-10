@@ -13,7 +13,7 @@
     + [Interact with SmartContract (Deployed)](#interact-with-smartcontract--deployed-)
     + [Test Smart Contract](#test-smart-contract)
     + [DApp](#dapp)
-  * [Usecase EV-Charging (GER)](#usecase-ev-charging--ger-)
+  * [Usecase EV-Charging](#usecase-ev-charging--ger-)
     + [Implementierung in DAPP](./docs/usecases_dapp.md)
   * [Maintainer / Imprint](#maintainer---imprint)
   * [LICENSE](#license)
@@ -102,7 +102,9 @@ Switch in Ganache to Transactions panel:
 
 Finally start Development HTTP Server:
 `cd app && npm run dev`
-## Usecase EV-Charging (GER)
+
+
+## Usecase EV-Charging (German)
 
 ![123456 drawio](https://user-images.githubusercontent.com/37406473/136455105-b984ba25-2624-4aa8-8e9a-5fed4fc09eeb.png)
 
