@@ -108,6 +108,9 @@ cd app
 npm install
 npm run dev
 ```
+Point browser to:
+http://localhost:8080/
+
 
 ## Usecase EV-Charging (German)
 
