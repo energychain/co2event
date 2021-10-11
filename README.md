@@ -103,8 +103,11 @@ Switch in Ganache to Transactions panel:
 ![Ganache Transactions Screen](./docs/ganache_post_migration.png)
 
 Finally start Development HTTP Server:
-`cd app && npm run dev`
-
+```shell
+cd app
+npm install
+npm run dev
+```
 
 ## Usecase EV-Charging (German)
 
