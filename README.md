@@ -3,7 +3,7 @@
 
 **GHG accounting and decompensation using DLT based Identity Management concepts (ID-Ideal AP8) in accordance to ISO14064-3. Usage domain: E-Mobility, Car-Charging**
 
-[![CO2Offset](https://api.corrently.io/v2.0/ghgmanage/statusimg?host=co2event&svg=1)](https://co2offset.io/badge.html?host=co2event) [![Code Quality](https://www.code-inspector.com/project/29364/status/svg)](https://frontend.code-inspector.com/public/project/29364/co2event/dashboard)[![Open Source Helpers](https://www.codetriage.com/energychain/co2event/badges/users.svg)](https://www.codetriage.com/energychain/co2event)
+[![CO2Offset](https://api.corrently.io/v2.0/ghgmanage/statusimg?host=co2event&svg=1)](https://co2offset.io/badge.html?host=co2event) [![Code Quality](https://www.code-inspector.com/project/29364/status/svg)](https://frontend.code-inspector.com/public/project/29364/co2event/dashboard)[![Open Source Helpers](https://www.codetriage.com/energychain/co2event/badges/users.svg)](https://www.codetriage.com/energychain/co2event)[![Netlify Status](https://api.netlify.com/api/v1/badges/941c2e47-8e68-4039-8f2f-085a57b1f0b9/deploy-status)](https://app.netlify.com/sites/co2accounting/deploys)
 
 - [co2event](#co2event)
   * [Business Case](#business-case)
