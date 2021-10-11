@@ -21,3 +21,4 @@ node_modules/
 # Waffle
 cache/
 artifacts/
+contracts/flatten
