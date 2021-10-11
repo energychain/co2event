@@ -26,6 +26,8 @@ contract CO2CertRegistry is AccessControl {
     address public owner;
     mapping(address => Certificate) public certificates;
 
+    address[] public externalCertificates;
+
     constructor() {
         owner = msg.sender;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -37,6 +39,7 @@ contract CO2CertRegistry is AccessControl {
         // certificates[certificate].spares = [];
         emit ExternalCertificate(certificate,co2eq);
         totalCertified += co2eq;
+        externalCertificates.push(certificate);
         return true;
     }
 
@@ -51,5 +54,6 @@ contract CO2CertRegistry is AccessControl {
          co2event.compensation(entity,co2eq);
          totalCompensated += co2eq;
          emit Compensation(co2event,certificate,entity,co2eq);
+         return true;
      }
 }

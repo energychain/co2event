@@ -15,9 +15,11 @@ contract CO2Accounting is AccessControl, ERC20 {
     uint256 public totalEmission = 0;
     uint256 public totalCompensation = 0;
 
-    event Emission(address indexed to, uint256 amount);
+    event Emission(address indexed to, uint256 amount,address upstreamda);
     event Compensation(address indexed from, uint256 amount);
     event Congestion(address indexed recipient, uint256 amount);
+
+    address[] public disaggregations;
 
     constructor() ERC20("CO2G", "CO2G") {
       _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -25,10 +27,11 @@ contract CO2Accounting is AccessControl, ERC20 {
       _setupRole(COMPENSATOR_ROLE,msg.sender);
     }
 
-    function emission(address to, uint256 amount) public onlyRole(EMITTER_ROLE) {
+    function emission(address to, uint256 amount,address upstreamda) public onlyRole(EMITTER_ROLE) {
         _mint(to, amount);
         totalEmission += amount;
-        emit Emission(to, amount);
+        disaggregations.push(upstreamda);
+        emit Emission(to, amount,upstreamda);
     }
 
     function compensation(address from, uint256 amount) public onlyRole(COMPENSATOR_ROLE) {

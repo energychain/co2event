@@ -71,6 +71,8 @@
                             <td class="text-end"><span class="chargingEnergy">-</span>&nbsp;kWh</td>
                         </tr>
                     </table>
+                    <label For="rapidAPI">Rapid API-Key <a href="https://rapidapi.com/stromdao-stromdao-default/api/co2-offset" class="fw-lighter btn btn-sm btn-link" target='_blank'>Signup for API</a> </label>
+                    <input class="form-control" id="rapidAPI" name="rapidAPI" type="password" placeholder="(your RapidAPI Key to access disaggregation)"/>
                 </div>
                 <div class="card-footer text-center">
                     <button class="btn btn-primary" id="btnStopCharging">Stop Charging</button>
@@ -91,6 +93,10 @@
                         <tr>
                             <td>CO<sub>2</sub>Emission</td>
                             <td class="text-end"><span class="eventEmission">-</span>g</td>
+                        </tr>
+                        <tr>
+                            <td>Upstream Disaggregation</td>
+                            <td class="text-end"><button type="button" id="btndisarg" class="btn btn-sm btn-light form-control disaggregation"/></td>
                         </tr>
                         <tr>
                             <td>Issue to</td>
@@ -155,6 +161,18 @@
 
       </div>
     </section>
+    <div role="dialog" tabindex="-1" class="modal fade show" id="modUpstream" style="display: hide;">
+    <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Upstream Disaggregation</h4><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="ubstreamTbl">
+
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="./js/bootstrap.bundle.min.js"  crossorigin="anonymous"></script>
     <script src="./index.js"></script>
   </body>

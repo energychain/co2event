@@ -117,7 +117,7 @@ const dapp = async function() {
         html += '<button type="button" class="btn btn-sm btn-primary useCertificate" data-remain="'+remainingCo2[0].toString()+'" data="'+certificates[i].args[0].toString()+'">'+certificates[i].args[0].toString() + '<span class="badge bg-success">'+remainingCo2[0]+'/'+certificates[i].args[1].toString()+'g</span></button>';
         html += '</li>';
       } else {
-        console.log('Missing certificate in UI',certificates[i]);
+        console.log('Missing certificate in UI',await certificates[i]);
       }
     }
     $('.certificatesList').html(html);
@@ -158,6 +158,79 @@ const dapp = async function() {
       });
     });
   };
+
+  const retrieveDisaggregation = async function(zip,wh) {
+    return new Promise(async function (resolve, reject) {
+      const settings = {
+      	"async": true,
+      	"crossDomain": true,
+      	"url": "https://co2-offset.p.rapidapi.com/rapidapi/dispatchcert?zip="+zip+"&wh="+wh,
+      	"method": "GET",
+      	"headers": {
+          "x-rapidapi-host": "co2-offset.p.rapidapi.com",
+          "x-rapidapi-key": $('#rapidAPI').val()
+      	}
+      };
+      window.localStorage.setItem("rapid-api-key",$('#rapidAPI').val());
+
+      await $.ajax(settings).done(function (response) {
+        resolve(response);
+      });
+    });
+  };
+
+  const retrieveIdentity = async function(identity) {
+    return new Promise(async function (resolve, reject) {
+      const settings = {
+        "async": true,
+      	"crossDomain": true,
+      	"url": "https://co2-offset.p.rapidapi.com/co2/identity?account="+identity,
+      	"method": "GET",
+        "headers": {
+          "x-rapidapi-host": "co2-offset.p.rapidapi.com",
+          "x-rapidapi-key": $('#rapidAPI').val()
+        }
+      };
+      window.localStorage.setItem("rapid-api-key",$('#rapidAPI').val());
+
+      await $.ajax(settings).done(function (response) {
+        resolve(response);
+      });
+    });
+  };
+
+  const showDisaggregation = async function() {
+    let data = await retrieveIdentity($('#btndisarg').attr('data'));
+    console.log(data);
+    let html = '<table class="table table-condensed">';
+    html += '<tr><td><strong>Meta Data</strong></td><td class="text-end">&nbsp;</td></tr>';
+    html += '<tr><td>&nbsp;Energy</td><td class="text-end">'+Math.round(data.wh)+' wh</td></tr>';
+    html += '<tr><td>&nbsp;CO2eq</td><td class="text-end">'+Math.round(data.emission)+' g</td></tr>';
+    html += '<tr><td>&nbsp;Location (ZIP)</td><td class="text-end">'+data.zip+'</td></tr>';
+    html += '<tr><td>&nbsp;Fix Timestamp</td><td class="text-end">'+new Date(data.timestamp).toLocaleString()+'</td></tr>';
+    html += '<tr><td>&nbsp;Observation Start</td><td class="text-end">'+new Date(data.upstream.observation.start).toLocaleString()+'</td></tr>';
+    html += '<tr><td>&nbsp;Observation End</td><td class="text-end">'+new Date(data.upstream.observation.end).toLocaleString()+'</td></tr>';
+    html += '<tr><td>&nbsp;Grid Distance</td><td class="text-end">'+data.upstream.avgdistance+' km</td></tr>';
+    html += '<tr><td><strong>Upstream</strong></td><td class="text-end">'+data.account+'</td></tr>';
+    html += '</table>';
+
+    html += '<h4>Dispatch/Disaggregation</h4>';
+    html += '<table class="table table-condensed">';
+    html += '<tr><th>Generation</th><th>%</th><th class="text-end">Wh</th><th class="text-end">Co2</th></tr>';
+    for(let i=0;i<data.upstream.mix.length;i++) {
+      html+="<tr>";
+      html+="<td>"+data.upstream.mix[i].type+"</td>";
+      html+="<td>"+(data.upstream.mix[i].ratio*100).toFixed(1)+"%</td>";
+      html+="<td class='text-end'>"+data.upstream.mix[i].wh+"</td>";
+      html+="<td class='text-end'>"+data.upstream.mix[i].co2+"</td>";
+      html+="</tr>";
+    }
+    html += '</table>';
+
+
+    $('#ubstreamTbl').html(html);
+    $('#modUpstream').modal('show');
+  }
 
   const renderStats = async function() {
     let totalSupply = -1;
@@ -276,7 +349,7 @@ const dapp = async function() {
     $('.chargingEnergy').html(energy.toFixed(3));
   }
 
-  const stopCharging = function() {
+  const stopCharging = async function() {
     $('#btnStopCharging').attr('disabled','disabled');
     $('.step1').removeClass("bg-primary").addClass("bg-dark");
     window.clearInterval(window.intervalCharging);
@@ -284,18 +357,20 @@ const dapp = async function() {
     chargingEvent.stop = new Date().getTime();
     chargingEvent.energy = energy;
     $('.step2').removeClass("bg-dark").addClass("bg-primary");
-    $.getJSON('https://api.corrently.io/v2.0/gsi/prediction?zip=69256',function(data) {
-        let emissionFactor = data.forecast[0].co2_g_oekostrom;
-        $('.eventEmissionFactor').html(emissionFactor);
-        $('.eventEmission').html(Math.round(emissionFactor * chargingEvent.energy));
-        chargingEvent.emission = Math.round(emissionFactor * chargingEvent.energy);
-        $('#btnTxSubmit').removeAttr('disabled');
-    });
+
+    const disaggregation = await retrieveDisaggregation('69256',energy * 1000);
+    console.log(disaggregation);
+    $('.eventEmissionFactor').html((disaggregation.electricity.totalConsumption) / disaggregation.co2.totalEmission);
+    $('.eventEmission').html(Math.round(disaggregation.co2.totalEmission));
+    chargingEvent.emission = Math.round(disaggregation.co2.totalEmission);
+    $('.disaggregation').html(disaggregation.signature);
+    $('.disaggregation').attr('data',disaggregation.signature);
+    $('#btnTxSubmit').removeAttr('disabled');
   }
 
   const transmitTx = async function() {
     $('#btnTxSubmit').attr('disabled','disabled');
-    console.log(await instance.connect(walletEmitter).emission(await signer.getAddress(),chargingEvent.emission));
+    console.log(await instance.connect(walletEmitter).emission(await signer.getAddress(),chargingEvent.emission,$('#btndisarg').attr('data')));
     window.location.reload();
   }
 
@@ -342,6 +417,8 @@ const dapp = async function() {
   $('#btnBuyCertificate').click(buyCertificate);
   $('#btnStopCharging').click(stopCharging);
   $('#btnTxCompensateSubmit').click(compensateUser);
+  $('#btndisarg').click(showDisaggregation);
+
   try {
       $('.account').val(await signer.getAddress());
       $('.onEthereum').show();
@@ -353,6 +430,7 @@ const dapp = async function() {
   if(window.localStorage.getItem("rapid-api-key") !== null) {
     $('#rapidAPI').val(window.localStorage.getItem("rapid-api-key"));
   }
+
 }
 $(document).ready( async () => {
   setInterval(function() {

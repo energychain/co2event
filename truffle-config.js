@@ -49,7 +49,7 @@ module.exports = {
     },
 
     integration: {
-      host: "172.29.4.134",     // Localhost (default: none)
+      host: "integration.corrently.io",     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
     },
