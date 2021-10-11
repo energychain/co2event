@@ -109,10 +109,16 @@ const dapp = async function() {
     let certificates = await certRegistry.queryFilter(filterCertificates);
     let html = '';
     for(let i=0;i<certificates.length;i++) {
-      let remainingCo2 = await certRegistry.certificates(certificates[i].args[0]);
-      html += '<li>';
-      html += '<button type="button" class="btn btn-sm btn-primary useCertificate" data-remain="'+remainingCo2[0].toString()+'" data="'+certificates[i].args[0].toString()+'">'+certificates[i].args[0].toString() + '<span class="badge bg-success">'+remainingCo2[0]+'/'+certificates[i].args[1].toString()+'g</span></button>';
-      html += '</li>';
+      let remainingCo2 = ['-'];
+      if(certificates[i].args !== null) {
+       remainingCo2 = await certRegistry.certificates(certificates[i].args[0]);
+
+        html += '<li>';
+        html += '<button type="button" class="btn btn-sm btn-primary useCertificate" data-remain="'+remainingCo2[0].toString()+'" data="'+certificates[i].args[0].toString()+'">'+certificates[i].args[0].toString() + '<span class="badge bg-success">'+remainingCo2[0]+'/'+certificates[i].args[1].toString()+'g</span></button>';
+        html += '</li>';
+      } else {
+        console.log('Missing certificate in UI',certificates[i]);
+      }
     }
     $('.certificatesList').html(html);
     $('.useCertificate').click(function(e) {
