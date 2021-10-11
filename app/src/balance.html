@@ -45,14 +45,33 @@
     </nav>
     <section id="charger" style="margin-top:150px;" class="clean-block">
       <div class="container text-start">
+        <div class="text-center">
+          <h2>GHG Balance Sheet</h2>
+          <h3><input type="text" disabled="disabled" class="account"/></h3>
+          <h5>Consensus in Block <span class="blocknumber"></span></h5>
+        </div>
         <div class="row" style="margin-bottom:35px">
           <div class="col">
             <div class="card flex-fill h-100">
                 <div class="card-header text-light bg-secondary">
                     <h3>Assets</h3>
                 </div>
-                <div class="card-body text-start flex-grow-1" id="step1" style="min-height: 200px;">
-
+                <div class="card-body text-start flex-grow-1" style="min-height: 200px;">
+                  <div class="tblAssets">
+                  </div>
+                  <h5 style="margin-top:25px">Obligation</h5>
+                  <div class="tblInBalance">
+                      <table class="table">
+                        <tr>
+                          <th>Block Number</th>
+                          <th class="text-end">CO<sub>2</sub>eq (g)</th>
+                        </tr>
+                        <tr>
+                          <td class="text-start blocknumber"></td>
+                          <td class="text-end text-danger">- <span class="accountCO2"></span></td>
+                        </tr>
+                      </table>
+                  </div>
                 </div>
               </div>
           </div>
@@ -61,8 +80,7 @@
                 <div class="card-header text-light bg-secondary">
                     <h3>Liabilities</h3>
                 </div>
-                <div class="card-body text-start flex-grow-1" id="step1" style="min-height: 200px;">
-                      test
+                <div class="card-body text-start flex-grow-1 tblLiabilities" style="min-height: 200px;">
                 </div>
               </div>
           </div>
