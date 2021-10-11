@@ -62,36 +62,45 @@ const parseMustache = function (str, obj) {
   });
 }
 
-$(document).ready( async () => {
-
-
+const dapp = async function() {
   const ethers = require("ethers");
   const Web3 = require("web3");
 
   const provider = new ethers.providers.Web3Provider(window.ethereum,"any")
   const signer = provider.getSigner();
-  const chainId = 5777;
+  let chainId = 5777;
+  if(typeof window.ethereum !== 'undefined') {
+    chainId = parseInt(window.ethereum.chainId, 16);
+  }
+  if(isNaN(chainId)) chainId = 5777;
+  if(chainId == 1337) chainId= 5777;
   let instance = {};
   let certRegistry = {};
+  window.chainId = chainId;
 
   try {
+    console.log('Welcome to CO2Accounting based on DLT!');
+    console.log('---------------------------------------');
+    console.log('chainId',chainId);
     const deployedNetwork = CO2Accounting.networks[chainId];
+    console.log('Deployment CO2Accounting',deployedNetwork.address);
     instance = new ethers.Contract( deployedNetwork.address , CO2Accounting.abi , signer )
     const deployedNetworkRegistry = CO2CertRegistry.networks[chainId];
+    console.log('Deployment CO2CertRegistry',deployedNetworkRegistry.address);
     certRegistry = new ethers.Contract( deployedNetworkRegistry.address , CO2CertRegistry.abi , signer )
-
 
     /** Setup Event Listening **/
     provider.on('block',function(data) {
       $('.blocknumber').html(data);
     })
 
-    const filterMyEmissions = instance.filters.Emission(provider.address);
+    const filterMyEmissions = instance.filters.Emission(await signer.getAddress());
     let liabilities = await instance.queryFilter(filterMyEmissions);
+
     const statsLiabilities = renderHTMLEvents(liabilities,'Liabilities');
     $('.tblLiabilities').html(statsLiabilities.html);
-
-    const filterMyCompensation = instance.filters.Compensation(provider.address);
+    //  await signer.getAddress()
+    const filterMyCompensation = instance.filters.Compensation(await signer.getAddress());
     let assets = await instance.queryFilter(filterMyCompensation);
     const statsAssets = renderHTMLEvents(assets,'Assets');
     $('.tblAssets').html(statsAssets.html);
@@ -137,7 +146,7 @@ $(document).ready( async () => {
       	}
       };
       window.localStorage.setItem("rapid-api-key",$('#rapidAPI').val());
-      
+
       await $.ajax(settings).done(function (response) {
         resolve(response);
       });
@@ -145,17 +154,24 @@ $(document).ready( async () => {
   };
 
   const renderStats = async function() {
-    $('.dltBlockNumber').html(provider._lastBlockNumber);
-    $('.dltConnection').html(provider.connection.url);
-    $('.accountBalance').html(ethers.utils.formatUnits(await provider.getBalance(await signer.getAddress())));
-    $('.mpoBalance').html(ethers.utils.formatUnits(await provider.getBalance(walletEmitter.address)));
-    $('.accountTx').html(await provider.getTransactionCount(await signer.getAddress()));
-    $('.mpoTx').html(await provider.getTransactionCount(walletEmitter.address));
-    $('.accountCO2').html((await instance.balanceOf(await signer.getAddress())).toString());
-    let totalSupply = (await instance.totalSupply()).toString() * 1;
-    let totalCertified = (await certRegistry.totalCertified()).toString() * 1;
-    let totalEmission =  (await instance.totalEmission()).toString() * 1;
-    let totalCompensation =  (await instance.totalCompensation()).toString() * 1;
+    let totalSupply = -1;
+    let totalCertified = -1;
+    let totalEmission = -1;
+    let totalCompensation = -1;
+
+    if(typeof instance.balanceOf !== 'undefined') {
+      $('.dltBlockNumber').html(provider._lastBlockNumber);
+      $('.dltConnection').html(provider.connection.url);
+      $('.accountBalance').html(ethers.utils.formatUnits(await provider.getBalance(await signer.getAddress())));
+      $('.mpoBalance').html(ethers.utils.formatUnits(await provider.getBalance(walletEmitter.address)));
+      $('.accountTx').html(await provider.getTransactionCount(await signer.getAddress()));
+      $('.mpoTx').html(await provider.getTransactionCount(walletEmitter.address));
+      $('.accountCO2').html((await instance.balanceOf(await signer.getAddress())).toString());
+      totalSupply = (await instance.totalSupply()).toString() * 1;
+      totalCertified = (await certRegistry.totalCertified()).toString() * 1;
+      totalEmission =  (await instance.totalEmission()).toString() * 1;
+      totalCompensation =  (await instance.totalCompensation()).toString() * 1;
+    }
     if(location.pathname.indexOf("consensus.html")>-1) {
         await $.ajax({
           url:"./img/consensus_frame.svg",
@@ -184,12 +200,14 @@ $(document).ready( async () => {
         const filterCertificates = certRegistry.filters.ExternalCertificate();
         let certificates = await certRegistry.queryFilter(filterCertificates);
         for(let i=0;i<certificates.length;i++) {
+          if(certificates[i].args !== null) {
           let cert = await certRegistry.certificates(certificates[i].args[0]);
-          html += '<tr>';
-          html += '<td><button type="button" data="' + certificates[i].args[0] + '" class="btn btn-sm btn-light btn-details">' + certificates[i].args[0] + '</button></td>';
-          html += '<td class="text-end">' + certificates[i].args[1].toString() + '</td>';
-          html += '<td class="text-end">' + cert[0].toString() + '</td>';
-          html += '</tr>';
+            html += '<tr>';
+            html += '<td><button type="button" data="' + certificates[i].args[0] + '" class="btn btn-sm btn-light btn-details">' + certificates[i].args[0] + '</button></td>';
+            html += '<td class="text-end">' + certificates[i].args[1].toString() + '</td>';
+            html += '<td class="text-end">' + cert[0].toString() + '</td>';
+            html += '</tr>';
+          }
         }
         html += '</table>';
         $('.extConsensus').html(html);
@@ -280,6 +298,7 @@ $(document).ready( async () => {
     $('.stepCompensate1').removeClass("bg-primary").addClass("bg-dark");
     const buyResult = await buyGSCertificate();
     const certificate = buyResult.certificate;
+    console.log(certRegistry);
     console.log(await certRegistry.connect(walletCompensator).addCertificate(certificate.compensation,certificate.co2requested));
     $('#compensateCertificate').val(certificate.compensation);
     $('#compensateCO2eq').val(certificate.co2requested);
@@ -328,4 +347,16 @@ $(document).ready( async () => {
   if(window.localStorage.getItem("rapid-api-key") !== null) {
     $('#rapidAPI').val(window.localStorage.getItem("rapid-api-key"));
   }
+}
+$(document).ready( async () => {
+  setInterval(function() {
+    if(typeof window.ethereum !== 'undefined') {
+        if(window.chainId !== window.ethereum.chainId) {
+          console.log('Starting on '+window.ethereum.chainId);
+          dapp();
+          window.chainId = window.ethereum.chainId;
+        }
+    }
+  },1000);
+  // dapp();
 })

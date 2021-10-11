@@ -6,8 +6,10 @@ targets:
     cmd: "npx waffle flatten"
   test-smartcontracts:
     cmd: "npm run test"
-  migrate-smartcontracts:
+  migrate-development:
     cmd: "npm run migrate"
+  migrate-integration:
+    cmd: "npm run migrate --network 6226"
   app-dev:
     cmd: "cd app && npm run dev"
   app-build:

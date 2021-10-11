@@ -15,9 +15,9 @@ contract CO2Accounting is AccessControl, ERC20 {
     uint256 public totalEmission = 0;
     uint256 public totalCompensation = 0;
 
-    event Emission(address to, uint256 amount);
-    event Compensation(address from, uint256 amount);
-    event Congestion(address recipient, uint256 amount);
+    event Emission(address indexed to, uint256 amount);
+    event Compensation(address indexed from, uint256 amount);
+    event Congestion(address indexed recipient, uint256 amount);
 
     constructor() ERC20("CO2G", "CO2G") {
       _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);

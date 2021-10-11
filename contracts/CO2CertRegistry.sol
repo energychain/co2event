@@ -7,8 +7,8 @@ import "./CO2Accounting.sol";
 
 contract CO2CertRegistry is AccessControl {
 
-   event ExternalCertificate(address externalcertificate,uint co2eq);
-   event Compensation(CO2Accounting co2event,address certificate,address entity,uint co2eq);
+   event ExternalCertificate(address indexed externalcertificate,uint co2eq);
+   event Compensation(CO2Accounting indexed co2event,address certificate,address entity,uint co2eq);
    uint256 public totalCertified = 0;
    uint256 public totalCompensated = 0;
 
