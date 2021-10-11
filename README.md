@@ -131,7 +131,9 @@ Implemented Use Cases with sample UI
 
 
 ## Maintainer / Imprint
+
 <img src="./docs/bmwi_note.png" align="right" height="300px" hspace="30px" vspace="30px">
+
 <addr>
 STROMDAO GmbH  <br/>
 Gerhard Weiser Ring 29  <br/>
