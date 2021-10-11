@@ -1,6 +1,14 @@
 import CO2Accounting from "../../build/contracts/CO2Accounting.json";
 import CO2CertRegistry from "../../build/contracts/CO2CertRegistry.json";
 
+const ethereumButton = document.querySelector('.enableEthereumButton');
+
+ethereumButton.addEventListener('click', () => {
+  //Will Start the metamask extension
+  ethereum.request({ method: 'eth_requestAccounts' });
+});
+
+
 const mockUpKeys = {
   'admin': {
     account:'0xD0FB2327EC99AF3F7b2762D75DD6d4790Cfaca74',
@@ -55,6 +63,7 @@ const parseMustache = function (str, obj) {
 }
 
 $(document).ready( async () => {
+
 
   const ethers = require("ethers");
   const Web3 = require("web3");
@@ -186,7 +195,7 @@ $(document).ready( async () => {
         $('.btn-details').unbind();
         $('.btn-details').click(function() {
           let certificate = $(this).attr('data');
-          $.getJSON("https://api.corrently.io/v2.0/co2/certificate?compensation="+certificate,function(data) {    
+          $.getJSON("https://api.corrently.io/v2.0/co2/certificate?compensation="+certificate,function(data) {
             $('#rowDetails').show();
             let html = '<table class="table table-condensed table-striped" style="margin-bottom:35px">';
             html += '<tr><td><strong>Verified Carbon Standard Certificate (VCS)</strong></td><td class="text-end">'+data.certificate.tree+'</td></tr>';
@@ -307,6 +316,12 @@ $(document).ready( async () => {
   $('#btnBuyCertificate').click(buyCertificate);
   $('#btnStopCharging').click(stopCharging);
   $('#btnTxCompensateSubmit').click(compensateUser);
-  $('.account').val(await signer.getAddress());
-
+  try {
+      $('.account').val(await signer.getAddress());
+      $('.onEthereum').show();
+      $('.enableEthereumButton').hide();
+  } catch(e) {
+    $('.onEthereum').hide();
+    $('.enableEthereumButton').show();
+  }
 })
