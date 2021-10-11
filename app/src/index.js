@@ -136,7 +136,8 @@ $(document).ready( async () => {
       		"x-rapidapi-key": $('#rapidAPI').val()
       	}
       };
-
+      window.localStorage.setItem("rapid-api-key",$('#rapidAPI').val());
+      
       await $.ajax(settings).done(function (response) {
         resolve(response);
       });
@@ -323,5 +324,8 @@ $(document).ready( async () => {
   } catch(e) {
     $('.onEthereum').hide();
     $('.enableEthereumButton').show();
+  }
+  if(window.localStorage.getItem("rapid-api-key") !== null) {
+    $('#rapidAPI').val(window.localStorage.getItem("rapid-api-key"));
   }
 })
