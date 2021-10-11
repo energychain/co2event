@@ -1,5 +1,6 @@
 # co2event
 <img src="./app/dist/img/idideal.png" align="right" height="85px" hspace="30px" vspace="30px">
+
 **GHG accounting and decompensation using DLT based Identity Management concepts (ID-Ideal AP8) in accordance to ISO14064-3. Usage domain: E-Mobility, Car-Charging**
 
 [![CO2Offset](https://api.corrently.io/v2.0/ghgmanage/statusimg?host=co2event&svg=1)](https://co2offset.io/badge.html?host=co2event) [![Code Quality](https://www.code-inspector.com/project/29364/status/svg)](https://frontend.code-inspector.com/public/project/29364/co2event/dashboard)
