@@ -5,8 +5,16 @@ const ethereumButton = document.querySelector('.enableEthereumButton');
 
 ethereumButton.addEventListener('click', () => {
   //Will Start the metamask extension
-  ethereum.request({ method: 'eth_requestAccounts' });
+  if(typeof ethereum !== 'undefined') {
+    ethereum.request({ method: 'eth_requestAccounts' });
+  } else {
+    window.clearInterval(window.intervalPoller);
+    dapp();
+  }
+  return true;
 });
+
+window.isconnected = false;
 
 
 const mockUpKeys = {
@@ -70,10 +78,26 @@ const parseMustache = function (str, obj) {
 const dapp = async function() {
   const ethers = require("ethers");
   const Web3 = require("web3");
-
-  const provider = new ethers.providers.Web3Provider(window.ethereum,"any")
-  const signer = provider.getSigner();
+  let provider = {};
+  let signer = {};
+  let active_account = '';
   let chainId = 5777;
+  if(typeof window.ethereum !== 'undefined') {
+    provider = new ethers.providers.Web3Provider(window.ethereum,"any");
+    signer = provider.getSigner();
+    active_account = await signer.getAddress();
+  } else {
+
+    provider = new ethers.providers.JsonRpcProvider("http://integration.corrently.io:8545/",6226);
+    await provider._networkPromise;
+    let wallet = ethers.Wallet.createRandom();
+    await wallet.connect(provider);
+    signer = wallet;
+    active_account = wallet.address;
+    chainId = 6226;
+  }
+
+
   if(typeof window.ethereum !== 'undefined') {
     chainId = parseInt(window.ethereum.chainId, 16);
   }
@@ -89,18 +113,18 @@ const dapp = async function() {
     console.log('chainId',chainId);
     const deployedNetwork = CO2Accounting.networks[chainId];
     console.log('Deployment CO2Accounting',deployedNetwork.address);
-    instance = new ethers.Contract( deployedNetwork.address , CO2Accounting.abi , signer )
+    instance = new ethers.Contract( deployedNetwork.address , CO2Accounting.abi , provider );
 
     const deployedNetworkRegistry = CO2CertRegistry.networks[chainId];
     console.log('Deployment CO2CertRegistry',deployedNetworkRegistry.address);
-    certRegistry = new ethers.Contract( deployedNetworkRegistry.address , CO2CertRegistry.abi , signer )
+    certRegistry = new ethers.Contract( deployedNetworkRegistry.address , CO2CertRegistry.abi , provider );
 
-    /** Setup Event Listening **/
     provider.on('block',function(data) {
       $('.blocknumber').html(data);
-    })
+    });
 
-    const filterMyEmissions = instance.filters.Emission(await signer.getAddress());
+    console.log('Active Identity',active_account);
+    const filterMyEmissions = instance.filters.Emission(active_account);
     let liabilities = await instance.queryFilter(filterMyEmissions);
 
     const statsLiabilities = renderHTMLEvents(liabilities,'Liabilities');
@@ -109,8 +133,8 @@ const dapp = async function() {
     $('.renderhtmlBtn').click(function() {
       showDisaggregation($(this).attr("data"));
     });
-    //  await signer.getAddress()
-    const filterMyCompensation = instance.filters.Compensation(await signer.getAddress());
+    
+    const filterMyCompensation = instance.filters.Compensation(active_account);
     let assets = await instance.queryFilter(filterMyCompensation);
     const statsAssets = renderHTMLEvents(assets,'Assets');
     $('.tblAssets').html(statsAssets.html);
@@ -184,7 +208,7 @@ const dapp = async function() {
           "x-rapidapi-key": apiKey
       	}
       };
-      window.localStorage.setItem("rapid-api-key",apiKey);
+      window.localStorage.setItem("rapidconsole.log('Click',window.isconnected);-api-key",apiKey);
 
       await $.ajax(settings).done(function (response) {
         resolve(response);
@@ -260,11 +284,11 @@ const dapp = async function() {
     if(typeof instance.balanceOf !== 'undefined') {
       $('.dltBlockNumber').html(provider._lastBlockNumber);
       $('.dltConnection').html(provider.connection.url);
-      $('.accountBalance').html(ethers.utils.formatUnits(await provider.getBalance(await signer.getAddress())));
+      $('.accountBalance').html(ethers.utils.formatUnits(await provider.getBalance(active_account)));
       $('.mpoBalance').html(ethers.utils.formatUnits(await provider.getBalance(walletEmitter.address)));
-      $('.accountTx').html(await provider.getTransactionCount(await signer.getAddress()));
+      $('.accountTx').html(await provider.getTransactionCount(active_account));
       $('.mpoTx').html(await provider.getTransactionCount(walletEmitter.address));
-      $('.accountCO2').html((await instance.balanceOf(await signer.getAddress())).toString());
+      $('.accountCO2').html((await instance.balanceOf(active_account)).toString());
       totalSupply = (await instance.totalSupply()).toString() * 1;
       totalCertified = (await certRegistry.totalCertified()).toString() * 1;
       totalEmission =  (await instance.totalEmission()).toString() * 1;
@@ -388,7 +412,7 @@ const dapp = async function() {
 
   const transmitTx = async function() {
     $('#btnTxSubmit').attr('disabled','disabled');
-    console.log(await instance.connect(walletEmitter).emission(await signer.getAddress(),chargingEvent.emission,$('#btndisarg').attr('data')));
+    console.log(await instance.connect(walletEmitter).emission(active_account,chargingEvent.emission,$('#btndisarg').attr('data')));
     window.location.reload();
   }
 
@@ -439,9 +463,11 @@ const dapp = async function() {
   });
 
   try {
-      $('.account').val(await signer.getAddress());
+      $('.account').val(active_account);
       $('.onEthereum').show();
       $('.enableEthereumButton').hide();
+      window.isconnected = true;
+
   } catch(e) {
     $('.onEthereum').hide();
     $('.enableEthereumButton').show();
@@ -452,8 +478,13 @@ const dapp = async function() {
 
 }
 $(document).ready( async () => {
-  setInterval(function() {
+  $('.onEthereum').hide();
+  $('.enableEthereumButton').click(function() {
+    // console.log('Click',window.isconnected);
+  });
+  window.intervalPoller = setInterval(function() {
     if(typeof window.ethereum !== 'undefined') {
+        window.clearInterval(window.intervalPoller);
         if(window.chainId !== window.ethereum.chainId) {
           console.log('Starting on '+window.ethereum.chainId);
           dapp();
