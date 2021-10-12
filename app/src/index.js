@@ -85,10 +85,11 @@ const dapp = async function() {
     const deployedNetwork = CO2Accounting.networks[chainId];
     console.log('Deployment CO2Accounting',deployedNetwork.address);
     instance = new ethers.Contract( deployedNetwork.address , CO2Accounting.abi , signer )
+
     const deployedNetworkRegistry = CO2CertRegistry.networks[chainId];
     console.log('Deployment CO2CertRegistry',deployedNetworkRegistry.address);
     certRegistry = new ethers.Contract( deployedNetworkRegistry.address , CO2CertRegistry.abi , signer )
-
+  
     /** Setup Event Listening **/
     provider.on('block',function(data) {
       $('.blocknumber').html(data);

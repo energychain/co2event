@@ -9,7 +9,7 @@ targets:
   migrate-development:
     cmd: "npm run migrate"
   migrate-integration:
-    cmd: "npm run migrate --network 6226"
+    cmd: "npm run migrate --network integration"
   app-dev:
     cmd: "cd app && npm run dev"
   app-build:
