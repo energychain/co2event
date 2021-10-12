@@ -376,7 +376,7 @@ const dapp = async function() {
 
     const disaggregation = await retrieveDisaggregation('69256',energy * 1000);
     console.log(disaggregation);
-    $('.eventEmissionFactor').html((disaggregation.electricity.totalConsumption) / disaggregation.co2.totalEmission);
+    $('.eventEmissionFactor').html(Math.round((disaggregation.electricity.totalConsumption) / disaggregation.co2.totalEmission));
     $('.eventEmission').html(Math.round(disaggregation.co2.totalEmission));
     chargingEvent.emission = Math.round(disaggregation.co2.totalEmission);
     $('.disaggregation').html(disaggregation.signature);
