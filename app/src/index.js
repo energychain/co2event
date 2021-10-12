@@ -232,14 +232,17 @@ const dapp = async function() {
 
     html += '<h4>Dispatch/Disaggregation</h4>';
     html += '<table class="table table-condensed">';
-    html += '<tr><th>Generation</th><th>%</th><th class="text-end">Wh</th><th class="text-end">Co2</th></tr>';
+    html += '<tr><th>Generation</th><th>%</th><th>&nbsp;</th><th class="text-end">Wh</th><th class="text-end">Co2</th></tr>';
     for(let i=0;i<data.upstream.mix.length;i++) {
+      if(Math.round(data.upstream.mix[i].ratio*100)>1) {
       html+="<tr>";
       html+="<td>"+data.upstream.mix[i].type+"</td>";
       html+="<td>"+(data.upstream.mix[i].ratio*100).toFixed(1)+"%</td>";
+      html+="<td><div class='bg-success' style='border:1px solid #000000;height:10px;width:"+Math.round(data.upstream.mix[i].ratio*100)+"px'></div>"+"</td>";
       html+="<td class='text-end'>"+data.upstream.mix[i].wh+"</td>";
       html+="<td class='text-end'>"+data.upstream.mix[i].co2+"</td>";
       html+="</tr>";
+      }
     }
     html += '</table>';
 
@@ -375,7 +378,6 @@ const dapp = async function() {
     $('.step2').removeClass("bg-dark").addClass("bg-primary");
 
     const disaggregation = await retrieveDisaggregation('69256',energy * 1000);
-    console.log(disaggregation);
     $('.eventEmissionFactor').html(Math.round((disaggregation.electricity.totalConsumption) / disaggregation.co2.totalEmission));
     $('.eventEmission').html(Math.round(disaggregation.co2.totalEmission));
     chargingEvent.emission = Math.round(disaggregation.co2.totalEmission);
@@ -395,7 +397,6 @@ const dapp = async function() {
     $('.stepCompensate1').removeClass("bg-primary").addClass("bg-dark");
     const buyResult = await buyGSCertificate();
     const certificate = buyResult.certificate;
-    console.log(certRegistry);
     console.log(await certRegistry.connect(walletCompensator).addCertificate(certificate.compensation,certificate.co2requested));
     $('#compensateCertificate').val(certificate.compensation);
     $('#compensateCO2eq').val(certificate.co2requested);
