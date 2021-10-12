@@ -88,7 +88,7 @@ const dapp = async function() {
     active_account = await signer.getAddress();
   } else {
 
-    provider = new ethers.providers.JsonRpcProvider("http://integration.corrently.io:8545/",6226);
+    provider = new ethers.providers.JsonRpcProvider("https://integration.corrently.io/",6226);
     await provider._networkPromise;
     let wallet = ethers.Wallet.createRandom();
     await wallet.connect(provider);
@@ -133,7 +133,7 @@ const dapp = async function() {
     $('.renderhtmlBtn').click(function() {
       showDisaggregation($(this).attr("data"));
     });
-    
+
     const filterMyCompensation = instance.filters.Compensation(active_account);
     let assets = await instance.queryFilter(filterMyCompensation);
     const statsAssets = renderHTMLEvents(assets,'Assets');
