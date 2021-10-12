@@ -34,7 +34,12 @@ const renderHTMLEvents = function(events,totalName) {
     for(let i=0;i<events.length;i++) {
       html += '<tr>';
       html += '<td>' + events[i].blockNumber + '</td>';
-      html += '<td class="text-end">' + events[i].args[1].toString() + '</td>';
+      html += '<td class="text-end">';
+      html += events[i].args[1].toString();
+      if(typeof events[i].args.upstreamda !== 'undefined') {
+        html += '<button type="button" class="btn btn-sm btn-light disaggregation renderhtmlBtn" data="'+events[i].args.upstreamda+'">i</button>';
+      }
+      html += '</td>';
       html += '</tr>';
       total += 1 * events[i].args[1].toString();
     }
@@ -89,7 +94,7 @@ const dapp = async function() {
     const deployedNetworkRegistry = CO2CertRegistry.networks[chainId];
     console.log('Deployment CO2CertRegistry',deployedNetworkRegistry.address);
     certRegistry = new ethers.Contract( deployedNetworkRegistry.address , CO2CertRegistry.abi , signer )
-  
+
     /** Setup Event Listening **/
     provider.on('block',function(data) {
       $('.blocknumber').html(data);
@@ -100,6 +105,10 @@ const dapp = async function() {
 
     const statsLiabilities = renderHTMLEvents(liabilities,'Liabilities');
     $('.tblLiabilities').html(statsLiabilities.html);
+    $('.renderhtmlBtn').unbind();
+    $('.renderhtmlBtn').click(function() {
+      showDisaggregation($(this).attr("data"));
+    });
     //  await signer.getAddress()
     const filterMyCompensation = instance.filters.Compensation(await signer.getAddress());
     let assets = await instance.queryFilter(filterMyCompensation);
@@ -162,6 +171,9 @@ const dapp = async function() {
 
   const retrieveDisaggregation = async function(zip,wh) {
     return new Promise(async function (resolve, reject) {
+      let apiKey = $('#rapidAPI').val();
+      if((typeof apiKey == 'undefined')||(apiKey == null)) apiKey = window.localStorage.getItem("rapid-api-key");
+
       const settings = {
       	"async": true,
       	"crossDomain": true,
@@ -169,10 +181,10 @@ const dapp = async function() {
       	"method": "GET",
       	"headers": {
           "x-rapidapi-host": "co2-offset.p.rapidapi.com",
-          "x-rapidapi-key": $('#rapidAPI').val()
+          "x-rapidapi-key": apiKey
       	}
       };
-      window.localStorage.setItem("rapid-api-key",$('#rapidAPI').val());
+      window.localStorage.setItem("rapid-api-key",apiKey);
 
       await $.ajax(settings).done(function (response) {
         resolve(response);
@@ -182,6 +194,9 @@ const dapp = async function() {
 
   const retrieveIdentity = async function(identity) {
     return new Promise(async function (resolve, reject) {
+      let apiKey = $('#rapidAPI').val();
+      if((typeof apiKey == 'undefined')||(apiKey == null)) apiKey = window.localStorage.getItem("rapid-api-key");
+
       const settings = {
         "async": true,
       	"crossDomain": true,
@@ -189,10 +204,10 @@ const dapp = async function() {
       	"method": "GET",
         "headers": {
           "x-rapidapi-host": "co2-offset.p.rapidapi.com",
-          "x-rapidapi-key": $('#rapidAPI').val()
+          "x-rapidapi-key": apiKey
         }
       };
-      window.localStorage.setItem("rapid-api-key",$('#rapidAPI').val());
+      window.localStorage.setItem("rapid-api-key",apiKey);
 
       await $.ajax(settings).done(function (response) {
         resolve(response);
@@ -200,8 +215,8 @@ const dapp = async function() {
     });
   };
 
-  const showDisaggregation = async function() {
-    let data = await retrieveIdentity($('#btndisarg').attr('data'));
+  const showDisaggregation = async function(identity) {
+    let data = await retrieveIdentity(identity);
     console.log(data);
     let html = '<table class="table table-condensed">';
     html += '<tr><td><strong>Meta Data</strong></td><td class="text-end">&nbsp;</td></tr>';
@@ -418,7 +433,9 @@ const dapp = async function() {
   $('#btnBuyCertificate').click(buyCertificate);
   $('#btnStopCharging').click(stopCharging);
   $('#btnTxCompensateSubmit').click(compensateUser);
-  $('#btndisarg').click(showDisaggregation);
+  $('#btndisarg').click(function() {
+    showDisaggregation($('#btndisarg').attr('data'));
+  });
 
   try {
       $('.account').val(await signer.getAddress());
