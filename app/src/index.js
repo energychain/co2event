@@ -133,6 +133,7 @@ const dapp = async function() {
     let liabilities = await instance.queryFilter(filterMyEmissions);
 
     const statsLiabilities = renderHTMLEvents(liabilities,'Liabilities');
+
     $('.tblLiabilities').html(statsLiabilities.html);
     $('.renderhtmlBtn').unbind();
     $('.renderhtmlBtn').click(function() {
@@ -144,9 +145,9 @@ const dapp = async function() {
     let assets = await instance.queryFilter(filterMyCompensation);
     const statsAssets = renderHTMLEvents(assets,'Assets');
     $('.tblAssets').html(statsAssets.html);
-
-    $('.accountCO2pre').html((await preSafings.balanceOf(active_account)).toString());
-
+    let aCO2p = (await preSafings.balanceOf(active_account)).toString() * 1;
+    $('.accountCO2pre').html(aCO2p);
+    $('.balanceTotal').html(statsLiabilities.sum + aCO2p);
     const filterCertificates = certRegistry.filters.ExternalCertificate();
     let certificates = await certRegistry.queryFilter(filterCertificates);
     let html = '';
@@ -296,7 +297,8 @@ const dapp = async function() {
       $('.mpoBalance').html(ethers.utils.formatUnits(await provider.getBalance(walletEmitter.address)));
       $('.accountTx').html(await provider.getTransactionCount(active_account));
       $('.mpoTx').html(await provider.getTransactionCount(walletEmitter.address));
-      $('.accountCO2').html((await instance.balanceOf(active_account)).toString());
+      let totalOwned = (await instance.balanceOf(active_account)).toString() * 1;
+      $('.accountCO2').html(totalOwned);
       totalSupply = (await instance.totalSupply()).toString() * 1;
       totalCertified = (await certRegistry.totalCertified()).toString() * 1;
       totalEmission =  (await instance.totalEmission()).toString() * 1;
