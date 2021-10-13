@@ -48,7 +48,9 @@ const renderHTMLEvents = function(events,totalName) {
       if(typeof events[i].args.upstreamda !== 'undefined') {
         html += '<button type="button" class="btn btn-sm btn-light disaggregation renderhtmlBtn" data="'+events[i].args.upstreamda+'">i</button>';
       }
-      console.log(events[i].args);
+      if(typeof events[i].args.certificate !== 'undefined') {
+        html += '<button type="button" class="btn btn-sm btn-light disaggregation renderhtmlBtn" data="'+events[i].args.certificate+'">i</button>';
+      }
       html += '</td>';
       html += '</tr>';
       total += 1 * events[i].args[1].toString();
@@ -132,20 +134,16 @@ const dapp = async function() {
     console.log('Active Identity',active_account);
     const filterMyEmissions = instance.filters.Emission(active_account);
     let liabilities = await instance.queryFilter(filterMyEmissions);
-
     const statsLiabilities = renderHTMLEvents(liabilities,'Liabilities');
-
     $('.tblLiabilities').html(statsLiabilities.html);
-    $('.renderhtmlBtn').unbind();
-    $('.renderhtmlBtn').click(function() {
-      showDisaggregation($(this).attr("data"));
-    });
-
-
     const filterMyCompensation = instance.filters.Compensation(active_account);
     let assets = await instance.queryFilter(filterMyCompensation);
     const statsAssets = renderHTMLEvents(assets,'Assets');
     $('.tblAssets').html(statsAssets.html);
+    $('.renderhtmlBtn').unbind();
+    $('.renderhtmlBtn').click(function() {
+      showDisaggregation($(this).attr("data"));
+    });
     let aCO2p = (await preSafings.balanceOf(active_account)).toString() * 1;
     $('.accountCO2pre').html(aCO2p);
     $('.balanceTotal').html(statsLiabilities.sum + aCO2p);
@@ -248,36 +246,89 @@ const dapp = async function() {
       });
     });
   };
+  const retrieveGSC = async function(serial_number) {
+    return new Promise(async function (resolve, reject) {
+      let apiKey = $('#rapidAPI').val();
+      if((typeof apiKey == 'undefined')||(apiKey == null)) apiKey = window.localStorage.getItem("rapid-api-key");
+
+      const settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": "https://co2-offset.p.rapidapi.com/co2/goldstandard/credits?query="+serial_number,
+        "method": "GET",
+        "headers": {
+          "x-rapidapi-host": "co2-offset.p.rapidapi.com",
+          "x-rapidapi-key": apiKey
+        }
+      };
+      window.localStorage.setItem("rapid-api-key",apiKey);
+
+      await $.ajax(settings).done(function (response) {
+        resolve(response);
+      });
+    });
+  };
 
   const showDisaggregation = async function(identity) {
     let data = await retrieveIdentity(identity);
     console.log(data);
-    let html = '<table class="table table-condensed">';
-    html += '<tr><td><strong>Meta Data</strong></td><td class="text-end">&nbsp;</td></tr>';
-    html += '<tr><td>&nbsp;Energy</td><td class="text-end">'+Math.round(data.wh)+' wh</td></tr>';
-    html += '<tr><td>&nbsp;CO2eq</td><td class="text-end">'+Math.round(data.emission)+' g</td></tr>';
-    html += '<tr><td>&nbsp;Location (ZIP)</td><td class="text-end">'+data.zip+'</td></tr>';
-    html += '<tr><td>&nbsp;Fix Timestamp</td><td class="text-end">'+new Date(data.timestamp).toLocaleString()+'</td></tr>';
-    html += '<tr><td>&nbsp;Observation Start</td><td class="text-end">'+new Date(data.upstream.observation.start).toLocaleString()+'</td></tr>';
-    html += '<tr><td>&nbsp;Observation End</td><td class="text-end">'+new Date(data.upstream.observation.end).toLocaleString()+'</td></tr>';
-    html += '<tr><td>&nbsp;Grid Distance</td><td class="text-end">'+data.upstream.avgdistance+' km</td></tr>';
-    html += '<tr><td><strong>Upstream</strong></td><td class="text-end">'+data.account+'</td></tr>';
-    html += '</table>';
 
-    html += '<h4>Dispatch/Disaggregation</h4>';
-    html += '<table class="table table-condensed">';
-    html += '<tr><th>Generation</th><th>%</th><th>&nbsp;</th><th class="text-end">Wh</th><th class="text-end">Co2</th></tr>';
-    for(let i=0;i<data.upstream.mix.length;i++) {
-      if(Math.round(data.upstream.mix[i].ratio*100)>1) {
-      html+="<tr>";
-      html+="<td>"+data.upstream.mix[i].type+"</td>";
-      html+="<td>"+(data.upstream.mix[i].ratio*100).toFixed(1)+"%</td>";
-      html+="<td><div class='bg-success' style='border:1px solid #000000;height:10px;width:"+Math.round(data.upstream.mix[i].ratio*100)+"px'></div>"+"</td>";
-      html+="<td class='text-end'>"+data.upstream.mix[i].wh+"</td>";
-      html+="<td class='text-end'>"+data.upstream.mix[i].co2+"</td>";
-      html+="</tr>";
-      }
+    let html = '<table class="table table-condensed">';
+    if(data.nature == "CO2 Offset Certificate") {
+      console.log(data);
+        html += '<tr><td><strong>VCS</strong></td><td>'+data.tx.certificate.tree+'</td></tr>';
+        html += '<tr><td>&nbsp;Provider</td><td>'+data.tx.certificate.issuer+'</td></tr>';
+        html += '<tr><td>&nbsp;Meta/Location</td><td>'+data.tx.certificate.meta+'</td></tr>';
+        html += '<tr><td>&nbsp;Long to Short Cyle CO<sub>2</sub></td><td>'+data.tx.co2+'g</td></tr>';
+        html += '<tr><td><strong>GSC/VER</strong></td><td>'+data.tx.gsc.tx.from+'</td></tr>';
+        let gsData = await retrieveIdentity(data.tx.gsc.tx.from);
+        html += '<tr><td>&nbsp;Parent Serial Number</td><td>'+gsData.serial_number+'</td></tr>';
+        let gscData = await retrieveGSC(gsData.serial_number);
+        gscData = gscData[0];
+        html += '<tr><td>&nbsp;Project</td><td>'+gscData.project.name+'</td></tr>';
+        html += '<tr><td>&nbsp;Description</td><td>'+gscData.project.description+'</td></tr>';
+        html += '<tr><td>&nbsp;Meta/Class</td><td>'+gscData.project.type+'</td></tr>';
+        html += '<tr><td>&nbsp;Meta/Location</td><td>'+gscData.project.country+'</td></tr>';
+        html += '<tr><td>&nbsp;Developer</td><td>'+gscData.project.project_developer+'</td></tr>';
+        html += '<tr><td>&nbsp;Product</td><td>'+gscData.product.name+'</td></tr>';
+        html += '<tr><td>&nbsp;Certified Date</td><td>'+gscData.certified_date+'</td></tr>';
+        html += '<tr><td>&nbsp;Sustainer Certificate</td><td><a href="'+gscData.project.sustaincert_url+'" target="_blank">open</a></td></tr>';
+        html += '<tr><td>&nbsp;Batch Number</td><td>'+gscData.batch_number+'</td></tr>';
+        html += '<tr><td>&nbsp;Monitor Period Start</td><td>'+gscData.monitoring_period_start_date+'</td></tr>';
+        html += '<tr><td>&nbsp;Monitor Period End</td><td>'+gscData.monitoring_period_end_date+'</td></tr>';
+        html += '<tr><td>&nbsp;Status</td><td>'+gscData.status+'</td></tr>';
+        html += '<tr><td>&nbsp;Vintage</td><td>'+gscData.vintage+'</td></tr>';
+        html += '<tr><td>&nbsp;CO<sub>2</sub> Offset</td><td>'+data.tx.co2requested+'g</td></tr>';
+
+        console.log(gscData);
     }
+    if(data.nature == "Upstream Disaggregation") {
+        html += '<tr><td><strong>Meta Data</strong></td><td class="text-end">&nbsp;</td></tr>';
+        html += '<tr><td>&nbsp;Energy</td><td class="text-end">'+Math.round(data.wh)+' wh</td></tr>';
+        html += '<tr><td>&nbsp;CO2eq</td><td class="text-end">'+Math.round(data.emission)+' g</td></tr>';
+        html += '<tr><td>&nbsp;Location (ZIP)</td><td class="text-end">'+data.zip+'</td></tr>';
+        html += '<tr><td>&nbsp;Fix Timestamp</td><td class="text-end">'+new Date(data.timestamp).toLocaleString()+'</td></tr>';
+        html += '<tr><td>&nbsp;Observation Start</td><td class="text-end">'+new Date(data.upstream.observation.start).toLocaleString()+'</td></tr>';
+        html += '<tr><td>&nbsp;Observation End</td><td class="text-end">'+new Date(data.upstream.observation.end).toLocaleString()+'</td></tr>';
+        html += '<tr><td>&nbsp;Grid Distance</td><td class="text-end">'+data.upstream.avgdistance+' km</td></tr>';
+        html += '<tr><td><strong>Upstream</strong></td><td class="text-end">'+data.account+'</td></tr>';
+        html += '</table>';
+
+        html += '<h4>Dispatch/Disaggregation</h4>';
+        html += '<table class="table table-condensed">';
+        html += '<tr><th>Generation</th><th>%</th><th>&nbsp;</th><th class="text-end">Wh</th><th class="text-end">Co2</th></tr>';
+        for(let i=0;i<data.upstream.mix.length;i++) {
+          if(Math.round(data.upstream.mix[i].ratio*100)>1) {
+          html+="<tr>";
+          html+="<td>"+data.upstream.mix[i].type+"</td>";
+          html+="<td>"+(data.upstream.mix[i].ratio*100).toFixed(1)+"%</td>";
+          html+="<td><div class='bg-success' style='border:1px solid #000000;height:10px;width:"+Math.round(data.upstream.mix[i].ratio*100)+"px'></div>"+"</td>";
+          html+="<td class='text-end'>"+data.upstream.mix[i].wh+"</td>";
+          html+="<td class='text-end'>"+data.upstream.mix[i].co2+"</td>";
+          html+="</tr>";
+          }
+        }
+      }
     html += '</table>';
 
 
