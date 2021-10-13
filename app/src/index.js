@@ -48,6 +48,7 @@ const renderHTMLEvents = function(events,totalName) {
       if(typeof events[i].args.upstreamda !== 'undefined') {
         html += '<button type="button" class="btn btn-sm btn-light disaggregation renderhtmlBtn" data="'+events[i].args.upstreamda+'">i</button>';
       }
+      console.log(events[i].args);
       html += '</td>';
       html += '</tr>';
       total += 1 * events[i].args[1].toString();

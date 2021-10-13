@@ -18,7 +18,7 @@ contract CO2Accounting is AccessControl, ERC20 {
     CO2Presafing public presafings = new CO2Presafing();
 
     event Emission(address indexed to, uint256 amount,address upstreamda,uint256 presafing);
-    event Compensation(address indexed from, uint256 amount);
+    event Compensation(address indexed from, uint256 amount,address certificate);
     event Congestion(address indexed recipient, uint256 amount);
 
     address[] public disaggregations;
@@ -37,10 +37,10 @@ contract CO2Accounting is AccessControl, ERC20 {
         emit Emission(to, amount,upstreamda,presafing);
     }
 
-    function compensation(address from, uint256 amount) public onlyRole(COMPENSATOR_ROLE) {
+    function compensation(address from, uint256 amount,address certificate) public onlyRole(COMPENSATOR_ROLE) {
         _burn(from, amount);
         totalCompensation += amount;
-        emit Compensation(from,amount);
+        emit Compensation(from,amount,certificate);
     }
 
     function transfer(address recipient, uint256 amount) public onlyRole(DEFAULT_ADMIN_ROLE) virtual override returns (bool) {

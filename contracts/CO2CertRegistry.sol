@@ -51,7 +51,7 @@ contract CO2CertRegistry is AccessControl {
                 co2eq: co2eq,
                 entity: entity
          }));
-         co2event.compensation(entity,co2eq);
+         co2event.compensation(entity,co2eq,certificate);
          totalCompensated += co2eq;
          emit Compensation(co2event,certificate,entity,co2eq);
          return true;

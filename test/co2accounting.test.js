@@ -58,7 +58,7 @@ describe('CO2Accounting', () => {
     await chai.expect(await contract.balanceOf(walletCompensator.address)).to.equal(0);
 
     // Run Emission Event transaction
-    await contract.connect(walletCompensator).compensation(walletEntity.address,32);
+    await contract.connect(walletCompensator).compensation(walletEntity.address,32,walletEntity.address);
 
     // Check Balances after Transaction
     await chai.expect(await contract.balanceOf(walletEmitter.address)).to.equal(0);
