@@ -1,5 +1,6 @@
 import CO2Accounting from "../../build/contracts/CO2Accounting.json";
 import CO2CertRegistry from "../../build/contracts/CO2CertRegistry.json";
+import CO2Presafing from "../../build/contracts/CO2Presafing.json";
 
 const ethereumButton = document.querySelector('.enableEthereumButton');
 
@@ -105,6 +106,8 @@ const dapp = async function() {
   if(chainId == 1337) chainId= 5777;
   let instance = {};
   let certRegistry = {};
+  let preSafings = {};
+
   window.chainId = chainId;
 
   try {
@@ -118,6 +121,8 @@ const dapp = async function() {
     const deployedNetworkRegistry = CO2CertRegistry.networks[chainId];
     console.log('Deployment CO2CertRegistry',deployedNetworkRegistry.address);
     certRegistry = new ethers.Contract( deployedNetworkRegistry.address , CO2CertRegistry.abi , provider );
+
+    preSafings = new ethers.Contract(await instance.presafings(),CO2Presafing.abi,provider);
 
     provider.on('block',function(data) {
       $('.blocknumber').html(data);
@@ -134,10 +139,13 @@ const dapp = async function() {
       showDisaggregation($(this).attr("data"));
     });
 
+
     const filterMyCompensation = instance.filters.Compensation(active_account);
     let assets = await instance.queryFilter(filterMyCompensation);
     const statsAssets = renderHTMLEvents(assets,'Assets');
     $('.tblAssets').html(statsAssets.html);
+
+    $('.accountCO2pre').html((await preSafings.balanceOf(active_account)).toString());
 
     const filterCertificates = certRegistry.filters.ExternalCertificate();
     let certificates = await certRegistry.queryFilter(filterCertificates);
@@ -407,12 +415,14 @@ const dapp = async function() {
     chargingEvent.emission = Math.round(disaggregation.co2.totalEmission);
     $('.disaggregation').html(disaggregation.signature);
     $('.disaggregation').attr('data',disaggregation.signature);
+    $('.disaggregation').attr('data-presafing',disaggregation.presafing);
     $('#btnTxSubmit').removeAttr('disabled');
   }
 
   const transmitTx = async function() {
     $('#btnTxSubmit').attr('disabled','disabled');
-    console.log(await instance.connect(walletEmitter).emission(active_account,chargingEvent.emission,$('#btndisarg').attr('data')));
+    let safing = 0;
+    console.log(await instance.connect(walletEmitter).emission(active_account,chargingEvent.emission,$('#btndisarg').attr('data'),$('#btndisarg').attr('data-presafing')));
     window.location.reload();
   }
 

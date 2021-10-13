@@ -8,7 +8,7 @@
     <!-- Bootstrap CSS -->
     <link href="./css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <script src="./js/jquery.js"></script>
-    <title>ID-Ideal AP8 - CO2Accounting - Compensator Role</title>
+    <title>STROMDAO - CO2Accounting</title>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-lg">
@@ -59,6 +59,19 @@
                 </div>
                 <div class="card-body text-start flex-grow-1" style="min-height: 200px;">
                   <div class="tblAssets">
+                  </div>
+                  <h5 style="margin-top:25px">Pre Order Compensation</h5>
+                  <div class="tblInBalance">
+                      <table class="table">
+                        <tr>
+                          <th>Block Number</th>
+                          <th class="text-end">CO<sub>2</sub>eq (g)</th>
+                        </tr>
+                        <tr>
+                          <td class="text-start blocknumber"></td>
+                          <td class="text-end text-danger">- <span class="accountCO2pre"></span></td>
+                        </tr>
+                      </table>
                   </div>
                   <h5 style="margin-top:25px">Obligation</h5>
                   <div class="tblInBalance">

@@ -1,5 +1,6 @@
 var CO2Accounting = artifacts.require("./CO2Accounting.sol");
 var CO2CertRegistry = artifacts.require("./CO2CertRegistry.sol");
+var CO2Presafing = artifacts.require("./CO2Presafing.sol");
 
 module.exports = async function(deployer,network, accounts) {
   await deployer.deploy(CO2Accounting);
