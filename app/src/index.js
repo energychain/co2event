@@ -201,7 +201,7 @@ const dapp = async function() {
     });
   };
 
-  const retrieveDisaggregation = async function(zip,wh) {
+  const retrieveDisaggregationElectricity = async function(zip,wh,product) {
     return new Promise(async function (resolve, reject) {
       let apiKey = $('#rapidAPI').val();
       if((typeof apiKey == 'undefined')||(apiKey == null)) apiKey = window.localStorage.getItem("rapid-api-key");
@@ -209,7 +209,7 @@ const dapp = async function() {
       const settings = {
       	"async": true,
       	"crossDomain": true,
-      	"url": "https://co2-offset.p.rapidapi.com/rapidapi/dispatchcert?zip="+zip+"&wh="+wh,
+      	"url": "https://co2-offset.p.rapidapi.com/rapidapi/dispatchcert?zip="+zip+"&wh="+wh+"&product="+product,
       	"method": "GET",
       	"headers": {
           "x-rapidapi-host": "co2-offset.p.rapidapi.com",
@@ -275,13 +275,13 @@ const dapp = async function() {
 
     let html = '<table class="table table-condensed">';
     if(data.nature == "CO2 Offset Certificate") {
-      console.log(data);
+
         html += '<tr><td><strong>VCS</strong></td><td>'+data.tx.certificate.tree+'</td></tr>';
         html += '<tr><td>&nbsp;Provider</td><td>'+data.tx.certificate.issuer+'</td></tr>';
         html += '<tr><td>&nbsp;Meta/Location</td><td>'+data.tx.certificate.meta+'</td></tr>';
         html += '<tr><td>&nbsp;Long to Short Cyle CO<sub>2</sub></td><td>'+data.tx.co2+'g</td></tr>';
-        html += '<tr><td><strong>GSC/VER</strong></td><td>'+data.tx.gsc.tx.from+'</td></tr>';
-        let gsData = await retrieveIdentity(data.tx.gsc.tx.from);
+        html += '<tr><td><strong>GSC/VER</strong></td><td>'+data.tx.gsc.tx.from.account+'</td></tr>';
+        let gsData = data.tx.gsc.tx.from;
         html += '<tr><td>&nbsp;Parent Serial Number</td><td>'+gsData.serial_number+'</td></tr>';
         let gscData = await retrieveGSC(gsData.serial_number);
         gscData = gscData[0];
@@ -299,8 +299,6 @@ const dapp = async function() {
         html += '<tr><td>&nbsp;Status</td><td>'+gscData.status+'</td></tr>';
         html += '<tr><td>&nbsp;Vintage</td><td>'+gscData.vintage+'</td></tr>';
         html += '<tr><td>&nbsp;CO<sub>2</sub> Offset</td><td>'+data.tx.co2requested+'g</td></tr>';
-
-        console.log(gscData);
     }
     if(data.nature == "Upstream Disaggregation") {
         html += '<tr><td><strong>Meta Data</strong></td><td class="text-end">&nbsp;</td></tr>';
@@ -463,8 +461,8 @@ const dapp = async function() {
     chargingEvent.energy = energy;
     $('.step2').removeClass("bg-dark").addClass("bg-primary");
 
-    const disaggregation = await retrieveDisaggregation('69256',energy * 1000);
-    $('.eventEmissionFactor').html(Math.round((disaggregation.electricity.totalConsumption) / disaggregation.co2.totalEmission));
+    const disaggregation = await retrieveDisaggregationElectricity($('#zipcode').val(),$('#kwh').val() * 1000,$('input[name=producttype]:checked').val());
+    $('.eventEmissionFactor').html(Math.round(disaggregation.co2.totalEmission / (disaggregation.electricity.totalConsumption/1000)));
     $('.eventEmission').html(Math.round(disaggregation.co2.totalEmission));
     chargingEvent.emission = Math.round(disaggregation.co2.totalEmission);
     $('.disaggregation').html(disaggregation.signature);

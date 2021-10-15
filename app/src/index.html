@@ -22,10 +22,10 @@
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                eMobility Prototype
+                CO<sub>2</sub> Accounting Framework
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="./index.html">Charging Event</a></li>
+                <li><a class="dropdown-item" href="./index.html">Electricity Consumption</a></li>
                 <li><a class="dropdown-item" href="./balance.html">GHG Balance Sheet</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item selected" href="./compensator.html">Compensator</a></li>
@@ -48,34 +48,31 @@
       <div class="container text-start">
         <div class="row" style="margin-bottom:35px">
           <div class="col">
-            <div class="card flex-fill h-100">
+            <div class="card flex-fill">
                 <div class="card-header bg-primary text-light step1">
-                    <h3>Charging App</h3>
+                    <h3>Electricity Consumption</h3>
                 </div>
                 <div class="card-body text-start flex-grow-1" id="step1" style="min-height: 200px;">
-                    <table class="table table-condensed">
-                        <tr>
-                            <td>Start</td>
-                            <td class="text-end"><span class="chargingStart">-</span></td>
-                        </tr>
-                        <tr>
-                            <td>Duration</td>
-                            <td class="text-end"><span class="chargingDuration">-</span>&nbsp;Min</td>
-                        </tr>
-                        <tr>
-                            <td>Power</td>
-                            <td class="text-end"><span class="chargingPower">-</span>&nbsp;KW</td>
-                        </tr>
-                        <tr>
-                            <td>Energy</td>
-                            <td class="text-end"><span class="chargingEnergy">-</span>&nbsp;kWh</td>
-                        </tr>
-                    </table>
+                  <table class="table table-condensed">
+                    <tr>
+                        <td>Postal Code (ZIP in Germany)</td>
+                        <td class="text-end"><input type="text" class="form-control" id="zipcode" maxlength="5" value="69256"></td>
+                    </tr>
+                    <tr>
+                        <td>Consumption (from Grid in kWh)</td>
+                        <td class="text-end"><input type="number" class="form-control" id="kwh" value="10.312" step="0.001" min="0.001"></td>
+                    </tr>
+                    <tr>
+                        <td>Product</td>
+                        <td class="text-end"><input type="radio" name="producttype" value="eco" selected checked>Eco / <input type="radio" name="producttype" value="standard" >Standard</td>
+                    </tr>
+                  </table>
+
                     <label For="rapidAPI">Rapid API-Key <a href="https://rapidapi.com/stromdao-stromdao-default/api/co2-offset" class="fw-lighter btn btn-sm btn-link" target='_blank'>Signup for API</a> </label>
                     <input class="form-control" id="rapidAPI" name="rapidAPI" type="password" placeholder="(your RapidAPI Key to access disaggregation)"/>
                 </div>
                 <div class="card-footer text-center">
-                    <button class="btn btn-primary" id="btnStopCharging">Stop Charging</button>
+                    <button class="btn btn-primary" id="btnStopCharging">Commit Settlement</button>
                 </div>
               </div>
           </div>
