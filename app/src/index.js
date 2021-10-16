@@ -36,13 +36,13 @@ const mockUpKeys = {
 const renderHTMLEvents = function(events,totalName) {
     let html = '<table class="table">'
     html += '<tr>';
-    html += '<th>Block Number</th>';
+    html += '<th>Transaction</th>';
     html += '<th class="text-end">CO<sub>2</sub>eq (g)</th>';
     html += '</tr>';
     let total=0;
     for(let i=0;i<events.length;i++) {
       html += '<tr>';
-      html += '<td>' + events[i].blockNumber + '</td>';
+      html += '<td class="bt_'+events[i].blockNumber+'"><span class="text-muted">#' + events[i].blockNumber + '</span></td>';
       html += '<td class="text-end">';
       html += events[i].args[1].toString();
       if(typeof events[i].args.upstreamda !== 'undefined') {
