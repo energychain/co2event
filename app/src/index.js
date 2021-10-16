@@ -216,7 +216,43 @@ const dapp = async function() {
           "x-rapidapi-key": apiKey
       	}
       };
-      window.localStorage.setItem("rapidconsole.log('Click',window.isconnected);-api-key",apiKey);
+      window.localStorage.setItem("rapid-api-key",apiKey);
+
+      await $.ajax(settings).done(function (response) {
+        resolve(response);
+      });
+    });
+  };
+
+  const retrieveDisaggregationCommodity = async function() {
+    return new Promise(async function (resolve, reject) {
+      let apiKey = $('#rapidAPI').val();
+      if((typeof apiKey == 'undefined')||(apiKey == null)) apiKey = window.localStorage.getItem("rapid-api-key");
+
+      let data = {
+        qty: $('#fpQTY').val(),
+        unit: $('#fpUnit').val(),
+        factor: $('#fpCO2EQ').val(),
+        activity: $('#fpActivity').val(),
+        title: $('#fpTitle').val()
+      };
+
+      const settings = {
+      	"async": true,
+      	"crossDomain": true,
+      	"url": "https://co2-offset.p.rapidapi.com/rapidapi/co2event",
+      	"method": "POST",
+      	"headers": {
+      		"x-rapidapi-host": "co2-offset.p.rapidapi.com",
+      		"x-rapidapi-key": apiKey,
+      		"content-type": "application/json"
+      	},
+      	"processData": false,
+      	"data": JSON.stringify(data)
+      };
+
+
+      window.localStorage.setItem("rapid-api-key",apiKey);
 
       await $.ajax(settings).done(function (response) {
         resolve(response);
@@ -268,12 +304,47 @@ const dapp = async function() {
       });
     });
   };
+  const retrieveFPsearch = async function(query) {
+    return new Promise(async function (resolve, reject) {
+      let apiKey = $('#rapidAPI').val();
+      if((typeof apiKey == 'undefined')||(apiKey == null)) apiKey = window.localStorage.getItem("rapid-api-key");
+
+      const settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": "https://co2-offset.p.rapidapi.com/co2/activity/search?q="+encodeURIComponent(query),
+        "method": "GET",
+        "headers": {
+          "x-rapidapi-host": "co2-offset.p.rapidapi.com",
+          "x-rapidapi-key": apiKey
+        }
+      };
+      window.localStorage.setItem("rapid-api-key",apiKey);
+
+      await $.ajax(settings).done(function (response) {
+        resolve(response);
+      });
+    });
+  };
 
   const showDisaggregation = async function(identity) {
     let data = await retrieveIdentity(identity);
-    console.log(data);
 
     let html = '<table class="table table-condensed">';
+    if(data.nature == "CO2 Commodity Event") {
+        html += '<tr><td><strong>Commodity Event</strong></td><td>'+data.account+'</td></tr>';
+        if(typeof data.event !== 'undefined') {
+          html += '<tr><td>&nbsp;Title</td><td>'+data.event.title+'</td></tr>';
+          html += '<tr><td>&nbspCO<sub>2</sub>eq</td><td>'+data.event.co2eq+'g</td></tr>';
+          html += '<tr><td>&nbspBase</td><td>'+data.event.qty+' '+data.event.unit+'</td></tr>';
+          html += '<tr><td>&nbspFactor</td><td>'+data.event.factor+'g/'+data.event.unit+'</td></tr>';
+          if(typeof data.event.activity !== 'undefined') {
+              html += '<tr><td><strong>Activity</strong></td><td>'+data.event.activity.en.title+'</td></tr>';
+              html += '<tr><td>Description</td><td>'+data.event.activity.description+'</td></tr>';
+              html += '<tr><td>Tags</td><td>'+data.event.activity.tags.join(', ')+'</td></tr>';
+          }
+        }
+    }
     if(data.nature == "CO2 Offset Certificate") {
 
         html += '<tr><td><strong>VCS</strong></td><td>'+data.tx.certificate.tree+'</td></tr>';
@@ -343,8 +414,10 @@ const dapp = async function() {
     if(typeof instance.balanceOf !== 'undefined') {
       $('.dltBlockNumber').html(provider._lastBlockNumber);
       $('.dltConnection').html(provider.connection.url);
-      $('.accountBalance').html(ethers.utils.formatUnits(await provider.getBalance(active_account)));
-      $('.mpoBalance').html(ethers.utils.formatUnits(await provider.getBalance(walletEmitter.address)));
+      if(typeof provider.getBalance !== 'undefined') {
+        $('.accountBalance').html(ethers.utils.formatUnits(await provider.getBalance(active_account)));
+        $('.mpoBalance').html(ethers.utils.formatUnits(await provider.getBalance(walletEmitter.address)));
+      }
       $('.accountTx').html(await provider.getTransactionCount(active_account));
       $('.mpoTx').html(await provider.getTransactionCount(walletEmitter.address));
       let totalOwned = (await instance.balanceOf(active_account)).toString() * 1;
@@ -456,25 +529,43 @@ const dapp = async function() {
     $('#btnStopCharging').attr('disabled','disabled');
     $('.step1').removeClass("bg-primary").addClass("bg-dark");
     window.clearInterval(window.intervalCharging);
-    let energy = ((new Date().getTime() - chargingEvent.start)/3600000) * chargingEvent.power;
-    chargingEvent.stop = new Date().getTime();
-    chargingEvent.energy = energy;
+
     $('.step2').removeClass("bg-dark").addClass("bg-primary");
 
-    const disaggregation = await retrieveDisaggregationElectricity($('#zipcode').val(),$('#kwh').val() * 1000,$('input[name=producttype]:checked').val());
+  const disaggregation = await retrieveDisaggregationElectricity($('#zipcode').val(),$('#kwh').val() * 1000,$('input[name=producttype]:checked').val());
     $('.eventEmissionFactor').html(Math.round(disaggregation.co2.totalEmission / (disaggregation.electricity.totalConsumption/1000)));
     $('.eventEmission').html(Math.round(disaggregation.co2.totalEmission));
     chargingEvent.emission = Math.round(disaggregation.co2.totalEmission);
     $('.disaggregation').html(disaggregation.signature);
     $('.disaggregation').attr('data',disaggregation.signature);
+    $('.disaggregation').attr('data-co2',disaggregation.co2.totalEmission);
     $('.disaggregation').attr('data-presafing',disaggregation.presafing);
+    $('#btnTxSubmit').removeAttr('disabled');
+  }
+
+  const commitSettlement = async function() {
+    $('#btnStopCharging').attr('disabled','disabled');
+    $('.step1').removeClass("bg-primary").addClass("bg-dark");
+    window.clearInterval(window.intervalCharging);
+    let energy = ((new Date().getTime() - chargingEvent.start)/3600000) * chargingEvent.power;
+    chargingEvent.stop = new Date().getTime();
+    chargingEvent.energy = energy;
+    $('.step2').removeClass("bg-dark").addClass("bg-primary");
+
+  const disaggregation = await retrieveDisaggregationCommodity();
+    $('.eventEmissionFactor').html(disaggregation.factor);
+    $('.eventEmission').html(Math.round(disaggregation.co2eq));
+    $('.disaggregation').html(disaggregation.event);
+    $('.disaggregation').attr('data',disaggregation.event);
+    $('.disaggregation').attr('data-co2',disaggregation.co2eq);
+    $('.disaggregation').attr('data-presafing',0);
     $('#btnTxSubmit').removeAttr('disabled');
   }
 
   const transmitTx = async function() {
     $('#btnTxSubmit').attr('disabled','disabled');
     let safing = 0;
-    console.log(await instance.connect(walletEmitter).emission(active_account,chargingEvent.emission,$('#btndisarg').attr('data'),$('#btndisarg').attr('data-presafing')));
+    console.log(await instance.connect(walletEmitter).emission(active_account,$('#btndisarg').attr('data-co2'),$('#btndisarg').attr('data'),$('#btndisarg').attr('data-presafing')));
     window.location.reload();
   }
 
@@ -498,6 +589,34 @@ const dapp = async function() {
       window.location.reload();
   }
 
+  const searchFootprint = async function() {
+    let results = await retrieveFPsearch($('#queryFootprint').val());
+    window.footprintLastResults = results;
+    let html = '<select id="resultFPrender">'
+    for(let i=0;i<results.length;i++) {
+      html+='<option value="'+results[i]._source.activity+'">'+results[i]._source.en.title+"</option>";
+    }
+    if(results.length > 0) {
+      $('#fpCO2EQ').val(window.footprintLastResults[0]._source.co2eq);
+      $('#fpUnit').html(window.footprintLastResults[0]._source.unit);
+      $('#fpTitle').val(window.footprintLastResults[0]._source.en.title);
+      $('#fpActivity').val(window.footprintLastResults[0]._source.activity);
+      $('#fpUnit').val(window.footprintLastResults[0]._source.unit);
+    }
+    html += '</select>';
+    $('#fpResults').html(html);
+    $('#resultFPrender').change(function() {
+      for(let i=0;i<window.footprintLastResults.length;i++) {
+          if(window.footprintLastResults[i]._source.activity == $('#resultFPrender').val()) {
+            $('#fpCO2EQ').val(window.footprintLastResults[i]._source.co2eq);
+            $('#fpUnit').html(window.footprintLastResults[i]._source.unit);
+            $('#fpTitle').val(window.footprintLastResults[i]._source.en.title);
+            $('#fpActivity').val(window.footprintLastResults[i]._source.activity);
+            $('#fpUnit').val(window.footprintLastResults[i]._source.unit);
+          }
+      }
+    });
+  }
   provider.on("network", (newNetwork, oldNetwork) => {
       if (oldNetwork) {
           window.location.reload();
@@ -515,10 +634,11 @@ const dapp = async function() {
 
   renderChargingEvent();
   renderStats();
-
+  $('#btnSearchFP').click(searchFootprint);
   $('#btnTxSubmit').click(transmitTx);
   $('#btnBuyCertificate').click(buyCertificate);
   $('#btnStopCharging').click(stopCharging);
+  $('#btnComitSettlement').click(commitSettlement);
   $('#btnTxCompensateSubmit').click(compensateUser);
   $('#btndisarg').click(function() {
     showDisaggregation($('#btndisarg').attr('data'));
@@ -542,7 +662,7 @@ const dapp = async function() {
 $(document).ready( async () => {
   $('.onEthereum').hide();
   $('.enableEthereumButton').click(function() {
-    // console.log('Click',window.isconnected);
+
   });
   window.intervalPoller = setInterval(function() {
     if(typeof window.ethereum !== 'undefined') {

@@ -13,7 +13,9 @@ module.exports = {
       { from: "./src/index.html", to: "index.html" },
       { from: "./src/compensator.html", to: "compensator.html" },
       { from: "./src/consensus.html", to: "consensus.html" },
-      { from: "./src/balance.html", to: "balance.html" }]),
+      { from: "./src/balance.html", to: "balance.html" },
+      { from: "./src/commodity.html", to: "commodity.html" }
+    ])
   ],
   devServer: { contentBase: path.join(__dirname, "dist"), compress: true },
 };
